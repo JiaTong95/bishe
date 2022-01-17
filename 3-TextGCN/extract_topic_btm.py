@@ -121,7 +121,7 @@ class BTM:
         self.get_unlabeled_texts()
         self.get_hashtags()
 
-        for hashtag in tqdm.tqdm(self.hashtags[:5]):
+        for hashtag in tqdm.tqdm(self.hashtags):
             print(f"当前hashtag={hashtag}")
             if hashtag in useless_hashtags:
                 continue

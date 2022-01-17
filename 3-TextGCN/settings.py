@@ -1,9 +1,10 @@
+ROOT_PATH = "/extend/bishe"
 CLEAN_CORPUS_PATH = "data/clean"
 GRAPH_PATH = "data/graph"
 WORD2ID_PATH = "data/word2id"
 LABEL_PATH = "data/labels"
-DATASET_PATH = "/extend/jt_2/0-dataset"
-ROOT_PATH = "/extend/jt_2"
+DATASET_PATH = ROOT_PATH + "/0-dataset"
+
 
 if __name__ == "__main__":
     import os
