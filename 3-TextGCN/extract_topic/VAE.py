@@ -58,14 +58,14 @@ class VAE(nn.Module):
         else:
             theta = _theta
         x_reconst = self.decode(theta)
-        return x_reconst, mu, log_var
+        return x_reconst, mu, log_var, theta
 
 if __name__ == '__main__':
     model = VAE(encode_dims=[1024,512,256,20],decode_dims=[20,128,768,1024])
     model = model.cuda()
     print(model)
     inpt = torch.randn(234,1024).cuda()
-    out,mu,log_var = model(inpt)
+    out, mu, log_var, theta = model(inpt)
     print(inpt, inpt.shape)
     print(out, out.shape)
     print(mu, mu.shape)

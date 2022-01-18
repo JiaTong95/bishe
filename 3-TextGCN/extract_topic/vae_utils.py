@@ -43,8 +43,7 @@ class DocDataset(Dataset):
                  tokenizer=None, 
                  stopwords=None, 
                  no_below=5, no_above=0.1, 
-                 hasLable=False, 
-                 rebuild=True, 
+                 hasLable=False,  
                  use_tfidf=False):
         tmpDir = f"temp"
         self.txtLines = txtLines
@@ -54,54 +53,45 @@ class DocDataset(Dataset):
         self.tfidf, self.tfidf_model = None, None
         if not os.path.exists(tmpDir):
             os.mkdir(tmpDir)
-        if not rebuild and os.path.exists(f"{tmpDir}/corpus.mm"):
-            self.bows = gensim.corpora.MmCorpus(f"{tmpDir}/corpus.mm")
-            if self.use_tfidf:
-                self.tfidf = gensim.corpora.MmCorpus(f"{tmpDir}/tfidf.mm")
-            self.dictionary = Dictionary.load_from_text(f"{tmpDir}/dict.txt")
-            self.docs = pickle.load(open(f"{tmpDir}/docs.pkl", 'rb'))
-            # because id2token is empty be default, it is a bug.
-            self.dictionary.id2token = {v: k for k,
-                                        v in self.dictionary.token2id.items()}
-        else:
-            if stopwords == None:
-                stopwords = set([l.strip('\n').strip() for l in open(
-                    f"{DATASET_PATH}/temp/stopwords-{lang}.txt", 'r', encoding='utf-8')])
-            # self.txtLines is the list of string, without any preprocessing.
-            # self.texts is the list of list of tokens.
-            print('Tokenizing ...')
-            if tokenizer is None:
-                tokenizer = SpacyTokenizer(stopwords=stopwords)
-            self.docs = tokenizer.tokenize(self.txtLines)
-            self.docs = [line for line in self.docs if line != []]
-            # build dictionary
-            self.dictionary = Dictionary(self.docs)
-            # self.dictionary.filter_n_most_frequent(remove_n=20)
-            # use Dictionary to remove un-relevant tokens
-            self.dictionary.filter_extremes(
-                no_below=no_below, no_above=no_above, keep_n=None)
-            self.dictionary.compactify()
-            # because id2token is empty by default, it is a bug.
-            self.dictionary.id2token = {v: k for k,
-                                        v in self.dictionary.token2id.items()}
-            # convert to BOW representation
-            self.bows, _docs = [], []
-            for doc in self.docs:
-                _bow = self.dictionary.doc2bow(doc)
-                if _bow != []:
-                    _docs.append(list(doc))
-                    self.bows.append(_bow)
-            self.docs = _docs
-            if self.use_tfidf == True:
-                self.tfidf_model = TfidfModel(self.bows)
-                self.tfidf = [self.tfidf_model[bow] for bow in self.bows]
-            # serialize the dictionary
-            gensim.corpora.MmCorpus.serialize(f"{tmpDir}/corpus.mm", self.bows)
-            self.dictionary.save_as_text(f"{tmpDir}/dict.txt")
-            pickle.dump(self.docs, open(f"{tmpDir}/docs.pkl", 'wb'))
-            if self.use_tfidf:
-                gensim.corpora.MmCorpus.serialize(
-                    f"{tmpDir}/tfidf.mm", self.tfidf)
+
+        if stopwords == None:
+            stopwords = set([l.strip('\n').strip() for l in open(
+                f"{DATASET_PATH}/temp/stopwords-{lang}.txt", 'r', encoding='utf-8')])
+        # self.txtLines is the list of string, without any preprocessing.
+        # self.texts is the list of list of tokens.
+        print('Tokenizing ...')
+        if tokenizer is None:
+            tokenizer = SpacyTokenizer(stopwords=stopwords)
+        self.docs = tokenizer.tokenize(self.txtLines)
+        self.docs = [line for line in self.docs if line != []]
+        # build dictionary
+        self.dictionary = Dictionary(self.docs)
+        # self.dictionary.filter_n_most_frequent(remove_n=20)
+        # use Dictionary to remove un-relevant tokens
+        self.dictionary.filter_extremes(
+            no_below=no_below, no_above=no_above, keep_n=None)
+        self.dictionary.compactify()
+        # because id2token is empty by default, it is a bug.
+        self.dictionary.id2token = {v: k for k,
+                                    v in self.dictionary.token2id.items()}
+        # convert to BOW representation
+        self.bows, _docs = [], []
+        for doc in self.docs:
+            _bow = self.dictionary.doc2bow(doc)
+            if _bow != []:
+                _docs.append(list(doc))
+                self.bows.append(_bow)
+        self.docs = _docs
+        if self.use_tfidf == True:
+            self.tfidf_model = TfidfModel(self.bows)
+            self.tfidf = [self.tfidf_model[bow] for bow in self.bows]
+        # serialize the dictionary
+        gensim.corpora.MmCorpus.serialize(f"{tmpDir}/corpus.mm", self.bows)
+        self.dictionary.save_as_text(f"{tmpDir}/dict.txt")
+        pickle.dump(self.docs, open(f"{tmpDir}/docs.pkl", 'wb'))
+        if self.use_tfidf:
+            gensim.corpora.MmCorpus.serialize(
+                f"{tmpDir}/tfidf.mm", self.tfidf)
         self.vocabsize = len(self.dictionary)
         self.numDocs = len(self.bows)
         print(f'Processed {len(self.bows)} documents.')

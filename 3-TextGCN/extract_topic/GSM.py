@@ -63,7 +63,7 @@ class GSM:
                     rec_loss += _rec_loss
                 rec_loss = rec_loss / n_samples
                 '''
-                bows_recon,mus,log_vars = self.vae(bows,lambda x:torch.softmax(x,dim=1))
+                bows_recon,mus,log_vars,topic_ditribution = self.vae(bows,lambda x:torch.softmax(x,dim=1))
                 if criterion=='cross_entropy':
                     logsoftmax = torch.log_softmax(bows_recon,dim=1)
                     rec_loss = -1.0 * torch.sum(bows*logsoftmax)
@@ -177,9 +177,9 @@ class GSM:
     def show_topic_words(self,topic_id=None,topK=15, dictionary=None):
         topic_words = []
         idxes = torch.eye(self.n_topic).to(self.device)
-        word_dist = self.vae.decode(idxes)
-        word_dist = torch.softmax(word_dist,dim=1)
-        vals,indices = torch.topk(word_dist,topK,dim=1)
+        word_dist = self.vae.decode(idxes) # [n_topic * bow_dim]
+        word_dist = torch.softmax(word_dist,dim=1) # [n_topic * bow_dim]
+        vals,indices = torch.topk(word_dist,topK,dim=1) 
         vals = vals.cpu().tolist()
         indices = indices.cpu().tolist()
         if self.id2token==None and dictionary!=None:
