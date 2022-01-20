@@ -1,0 +1,6 @@
+model_name=lstm	dataset=SDwH	target=trump
+micro_f=0.3922, f_avg=0.3715, f_against=0.4071, f_favor=0.2478, f_none=0.4597
+0.3922	0.3715	0.4071	0.2478	0.4597
+model_name=lstm	                   dataset=SDwH	                   target=trump	                   learning_rate=1e-05	                   dropout=0.1	                   num_epoch=10	                   batch_size=16
+micro_f=0.3944, f_avg=0.2826, f_against=0.5144, f_favor=0.0, f_none=0.3333
+0.3944	0.2826	0.5144	0.0	0.3333

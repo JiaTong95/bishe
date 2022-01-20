@@ -73,7 +73,13 @@ class Instructor:
         
         if mode=='0':
             # mode0 写入结果文件中
-            s += f"model_name={self.opt.model_name}\tdataset={self.opt.dataset}\ttarget={self.opt.target}\n"
+            s += f"model_name={self.opt.model_name}\t\
+                   dataset={self.opt.dataset}\t\
+                   target={self.opt.target}\t\
+                   learning_rate={self.opt.learning_rate}\t\
+                   dropout={self.opt.dropout}\t\
+                   num_epoch={self.opt.num_epoch}\t\
+                   batch_size={self.opt.batch_size}\n"
             s += f"micro_f={micro_f:.4}, f_avg={f_avg:.4}, f_against={f_against:.4}, f_favor={f_favor:.4}, f_none={f_none:.4}\n"
             s += f"{micro_f:.4}\t{f_avg:.4}\t{f_against:.4}\t{f_favor:.4}\t{f_none:.4}\n"
         if mode=='1':
