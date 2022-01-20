@@ -14,6 +14,7 @@ from models.atae_lstm import ATAE_LSTM
 from models.tnet_lf import TNet_LF
 from models.aoa import AOA
 from models.mgan import MGAN
+from models.bert_base import BERT_BASE
 from models.bert_spc import BERT_SPC
 from models.aen import AEN_BERT
 from models.lcf_bert import LCF_BERT

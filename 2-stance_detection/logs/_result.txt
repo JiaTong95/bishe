@@ -1,6 +1,217 @@
-model_name=lstm	dataset=SDwH	target=trump
-micro_f=0.3922, f_avg=0.3715, f_against=0.4071, f_favor=0.2478, f_none=0.4597
-0.3922	0.3715	0.4071	0.2478	0.4597
-model_name=lstm	                   dataset=SDwH	                   target=trump	                   learning_rate=1e-05	                   dropout=0.1	                   num_epoch=10	                   batch_size=16
-micro_f=0.3944, f_avg=0.2826, f_against=0.5144, f_favor=0.0, f_none=0.3333
-0.3944	0.2826	0.5144	0.0	0.3333
+
+model_name=lstm dataset=SDwH target=trump learning_rate=1e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4224, f_avg=0.3318, f_against=0.4759, f_favor=0.01481, f_none=0.5045
+0.4224	0.3318	0.4759	0.01481	0.5045
+model_name=lstm dataset=SDwH target=trump learning_rate=5e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.5065, f_avg=0.4811, f_against=0.5119, f_favor=0.3483, f_none=0.5831
+0.5065	0.4811	0.5119	0.3483	0.5831
+model_name=lstm dataset=SDwH target=trump learning_rate=1e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4224, f_avg=0.3318, f_against=0.4759, f_favor=0.01481, f_none=0.5045
+0.4224	0.3318	0.4759	0.01481	0.5045
+model_name=lstm dataset=SDwH target=biden learning_rate=1e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4468, f_avg=0.4227, f_against=0.29, f_favor=0.5166, f_none=0.4615
+0.4468	0.4227	0.29	0.5166	0.4615
+model_name=lstm dataset=SDwH target=trump learning_rate=5e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.5065, f_avg=0.4811, f_against=0.5119, f_favor=0.3483, f_none=0.5831
+0.5065	0.4811	0.5119	0.3483	0.5831
+model_name=lstm dataset=SDwH target=biden learning_rate=5e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4745, f_avg=0.4726, f_against=0.4411, f_favor=0.4955, f_none=0.4812
+0.4745	0.4726	0.4411	0.4955	0.4812
+model_name=lstm dataset=SDwH target=trump learning_rate=0.0001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4892, f_avg=0.4875, f_against=0.5205, f_favor=0.4694, f_none=0.4726
+0.4892	0.4875	0.5205	0.4694	0.4726
+model_name=lstm dataset=SDwH target=biden learning_rate=0.0001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4838, f_avg=0.4833, f_against=0.4621, f_favor=0.4691, f_none=0.5188
+0.4838	0.4833	0.4621	0.4691	0.5188
+model_name=lstm dataset=SDwH target=trump learning_rate=0.0005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4418, f_avg=0.3404, f_against=0.5377, f_favor=0.0, f_none=0.4834
+0.4418	0.3404	0.5377	0.0	0.4834
+model_name=lstm dataset=SDwH target=biden learning_rate=0.0005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4537, f_avg=0.4499, f_against=0.4275, f_favor=0.4145, f_none=0.5076
+0.4537	0.4499	0.4275	0.4145	0.5076
+model_name=lstm dataset=SDwH target=trump learning_rate=0.001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4569, f_avg=0.3538, f_against=0.5143, f_favor=0.0, f_none=0.5471
+0.4569	0.3538	0.5143	0.0	0.5471
+model_name=lstm dataset=SDwH target=biden learning_rate=0.001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4653, f_avg=0.4643, f_against=0.4307, f_favor=0.4505, f_none=0.5118
+0.4653	0.4643	0.4307	0.4505	0.5118
+model_name=lstm dataset=SDwH target=trump learning_rate=0.005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4828, f_avg=0.3756, f_against=0.5576, f_favor=0.0, f_none=0.5691
+0.4828	0.3756	0.5576	0.0	0.5691
+model_name=lstm dataset=SDwH target=biden learning_rate=0.005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4352, f_avg=0.4245, f_against=0.4128, f_favor=0.3417, f_none=0.519
+0.4352	0.4245	0.4128	0.3417	0.519
+model_name=text_cnn dataset=SDwH target=trump learning_rate=1e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.5194, f_avg=0.5132, f_against=0.5215, f_favor=0.467, f_none=0.5511
+0.5194	0.5132	0.5215	0.467	0.5511
+model_name=text_cnn dataset=SDwH target=biden learning_rate=1e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4769, f_avg=0.475, f_against=0.4247, f_favor=0.4927, f_none=0.5076
+0.4769	0.475	0.4247	0.4927	0.5076
+model_name=text_cnn dataset=SDwH target=trump learning_rate=5e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.5388, f_avg=0.5376, f_against=0.5254, f_favor=0.5259, f_none=0.5614
+0.5388	0.5376	0.5254	0.5259	0.5614
+model_name=text_cnn dataset=SDwH target=biden learning_rate=5e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.5185, f_avg=0.5114, f_against=0.4304, f_favor=0.527, f_none=0.5769
+0.5185	0.5114	0.4304	0.527	0.5769
+model_name=text_cnn dataset=SDwH target=trump learning_rate=0.0001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.5539, f_avg=0.5519, f_against=0.5282, f_favor=0.5505, f_none=0.577
+0.5539	0.5519	0.5282	0.5505	0.577
+model_name=text_cnn dataset=SDwH target=biden learning_rate=0.0001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.5, f_avg=0.4932, f_against=0.4206, f_favor=0.4911, f_none=0.568
+0.5	0.4932	0.4206	0.4911	0.568
+model_name=text_cnn dataset=SDwH target=trump learning_rate=0.0005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.5194, f_avg=0.5115, f_against=0.473, f_favor=0.4895, f_none=0.5722
+0.5194	0.5115	0.473	0.4895	0.5722
+model_name=text_cnn dataset=SDwH target=biden learning_rate=0.0005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.5023, f_avg=0.495, f_against=0.4111, f_favor=0.5, f_none=0.574
+0.5023	0.495	0.4111	0.5	0.574
+model_name=text_cnn dataset=SDwH target=trump learning_rate=0.001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4978, f_avg=0.4819, f_against=0.4264, f_favor=0.4557, f_none=0.5635
+0.4978	0.4819	0.4264	0.4557	0.5635
+model_name=text_cnn dataset=SDwH target=biden learning_rate=0.001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4977, f_avg=0.4735, f_against=0.3235, f_favor=0.5684, f_none=0.5286
+0.4977	0.4735	0.3235	0.5684	0.5286
+model_name=text_cnn dataset=SDwH target=trump learning_rate=0.005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.5065, f_avg=0.4944, f_against=0.4488, f_favor=0.4692, f_none=0.5652
+0.5065	0.4944	0.4488	0.4692	0.5652
+model_name=text_cnn dataset=SDwH target=biden learning_rate=0.005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4861, f_avg=0.4718, f_against=0.3534, f_favor=0.5503, f_none=0.5118
+0.4861	0.4718	0.3534	0.5503	0.5118
+model_name=atae_lstm dataset=SDwH target=trump learning_rate=1e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4547, f_avg=0.4138, f_against=0.4888, f_favor=0.2235, f_none=0.5293
+0.4547	0.4138	0.4888	0.2235	0.5293
+model_name=atae_lstm dataset=SDwH target=biden learning_rate=1e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4259, f_avg=0.4099, f_against=0.301, f_favor=0.4693, f_none=0.4594
+0.4259	0.4099	0.301	0.4693	0.4594
+model_name=atae_lstm dataset=SDwH target=trump learning_rate=5e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4591, f_avg=0.4497, f_against=0.3755, f_favor=0.4571, f_none=0.5163
+0.4591	0.4497	0.3755	0.4571	0.5163
+model_name=atae_lstm dataset=SDwH target=biden learning_rate=5e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4815, f_avg=0.4789, f_against=0.432, f_favor=0.4795, f_none=0.5253
+0.4815	0.4789	0.432	0.4795	0.5253
+model_name=atae_lstm dataset=SDwH target=trump learning_rate=0.0001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.444, f_avg=0.4385, f_against=0.397, f_favor=0.4158, f_none=0.5028
+0.444	0.4385	0.397	0.4158	0.5028
+model_name=atae_lstm dataset=SDwH target=biden learning_rate=0.0001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4444, f_avg=0.4374, f_against=0.4855, f_favor=0.3539, f_none=0.4727
+0.4444	0.4374	0.4855	0.3539	0.4727
+model_name=atae_lstm dataset=SDwH target=biden learning_rate=0.0005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4606, f_avg=0.4612, f_against=0.4982, f_favor=0.4192, f_none=0.4662
+0.4606	0.4612	0.4982	0.4192	0.4662
+model_name=atae_lstm dataset=SDwH target=trump learning_rate=0.0005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4504, f_avg=0.3504, f_against=0.5187, f_favor=0.0, f_none=0.5326
+0.4504	0.3504	0.5187	0.0	0.5326
+model_name=atae_lstm dataset=SDwH target=biden learning_rate=0.001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4491, f_avg=0.4458, f_against=0.439, f_favor=0.4668, f_none=0.4315
+0.4491	0.4458	0.439	0.4668	0.4315
+model_name=atae_lstm dataset=SDwH target=trump learning_rate=0.001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4332, f_avg=0.3347, f_against=0.4798, f_favor=0.0, f_none=0.5244
+0.4332	0.3347	0.4798	0.0	0.5244
+model_name=atae_lstm dataset=SDwH target=biden learning_rate=0.005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.3634, f_avg=0.1777, f_against=0.0, f_favor=0.5331, f_none=0.0
+0.3634	0.1777	0.0	0.5331	0.0
+model_name=atae_lstm dataset=SDwH target=trump learning_rate=0.005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4009, f_avg=0.3092, f_against=0.4343, f_favor=0.0, f_none=0.4933
+0.4009	0.3092	0.4343	0.0	0.4933
+model_name=ian dataset=SDwH target=biden learning_rate=1e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.3958, f_avg=0.3769, f_against=0.3168, f_favor=0.4665, f_none=0.3475
+0.3958	0.3769	0.3168	0.4665	0.3475
+model_name=ian dataset=SDwH target=trump learning_rate=1e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4116, f_avg=0.312, f_against=0.4156, f_favor=0.0, f_none=0.5205
+0.4116	0.312	0.4156	0.0	0.5205
+model_name=ian dataset=SDwH target=biden learning_rate=5e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4213, f_avg=0.4163, f_against=0.3793, f_favor=0.454, f_none=0.4155
+0.4213	0.4163	0.3793	0.454	0.4155
+model_name=ian dataset=SDwH target=trump learning_rate=5e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4159, f_avg=0.3229, f_against=0.4976, f_favor=0.0, f_none=0.4712
+0.4159	0.3229	0.4976	0.0	0.4712
+model_name=ian dataset=SDwH target=biden learning_rate=0.0001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.419, f_avg=0.4132, f_against=0.3879, f_favor=0.4646, f_none=0.3871
+0.419	0.4132	0.3879	0.4646	0.3871
+model_name=ian dataset=SDwH target=trump learning_rate=0.0001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4159, f_avg=0.3229, f_against=0.4976, f_favor=0.0, f_none=0.4712
+0.4159	0.3229	0.4976	0.0	0.4712
+model_name=ian dataset=SDwH target=biden learning_rate=0.0005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.3935, f_avg=0.3654, f_against=0.2391, f_favor=0.4685, f_none=0.3887
+0.3935	0.3654	0.2391	0.4685	0.3887
+model_name=ian dataset=SDwH target=trump learning_rate=0.0005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4116, f_avg=0.3199, f_against=0.4794, f_favor=0.0, f_none=0.4804
+0.4116	0.3199	0.4794	0.0	0.4804
+model_name=ian dataset=SDwH target=biden learning_rate=0.001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.3727, f_avg=0.2243, f_against=0.04348, f_favor=0.5282, f_none=0.1013
+0.3727	0.2243	0.04348	0.5282	0.1013
+model_name=ian dataset=SDwH target=trump learning_rate=0.001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.347, f_avg=0.1717, f_against=0.5152, f_favor=0.0, f_none=0.0
+0.347	0.1717	0.5152	0.0	0.0
+model_name=ian dataset=SDwH target=biden learning_rate=0.005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.3819, f_avg=0.2783, f_against=0.3119, f_favor=0.523, f_none=0.0
+0.3819	0.2783	0.3119	0.523	0.0
+model_name=ian dataset=SDwH target=trump learning_rate=0.005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.3836, f_avg=0.2889, f_against=0.5031, f_favor=0.0, f_none=0.3636
+0.3836	0.2889	0.5031	0.0	0.3636
+model_name=memnet dataset=SDwH target=biden learning_rate=1e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.5023, f_avg=0.4952, f_against=0.4378, f_favor=0.5404, f_none=0.5074
+0.5023	0.4952	0.4378	0.5404	0.5074
+model_name=memnet dataset=SDwH target=trump learning_rate=1e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4871, f_avg=0.4741, f_against=0.528, f_favor=0.3805, f_none=0.5138
+0.4871	0.4741	0.528	0.3805	0.5138
+model_name=memnet dataset=SDwH target=biden learning_rate=5e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.5208, f_avg=0.5163, f_against=0.4766, f_favor=0.5476, f_none=0.5248
+0.5208	0.5163	0.4766	0.5476	0.5248
+model_name=memnet dataset=SDwH target=trump learning_rate=5e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.5151, f_avg=0.5116, f_against=0.4983, f_favor=0.4833, f_none=0.5531
+0.5151	0.5116	0.4983	0.4833	0.5531
+model_name=memnet dataset=SDwH target=biden learning_rate=0.0001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4792, f_avg=0.4761, f_against=0.4953, f_favor=0.4967, f_none=0.4362
+0.4792	0.4761	0.4953	0.4967	0.4362
+model_name=memnet dataset=SDwH target=trump learning_rate=0.0001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.5108, f_avg=0.5106, f_against=0.5, f_favor=0.5049, f_none=0.527
+0.5108	0.5106	0.5	0.5049	0.527
+model_name=memnet dataset=SDwH target=biden learning_rate=0.0005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.5162, f_avg=0.5144, f_against=0.49, f_favor=0.4918, f_none=0.5613
+0.5162	0.5144	0.49	0.4918	0.5613
+model_name=memnet dataset=SDwH target=trump learning_rate=0.0005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4634, f_avg=0.4573, f_against=0.3869, f_favor=0.4658, f_none=0.5193
+0.4634	0.4573	0.3869	0.4658	0.5193
+model_name=memnet dataset=SDwH target=biden learning_rate=0.001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4861, f_avg=0.4794, f_against=0.4724, f_favor=0.5183, f_none=0.4474
+0.4861	0.4794	0.4724	0.5183	0.4474
+model_name=memnet dataset=SDwH target=trump learning_rate=0.001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4957, f_avg=0.4925, f_against=0.5307, f_favor=0.4667, f_none=0.48
+0.4957	0.4925	0.5307	0.4667	0.48
+model_name=memnet dataset=SDwH target=biden learning_rate=0.005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4306, f_avg=0.4131, f_against=0.3615, f_favor=0.3524, f_none=0.5252
+0.4306	0.4131	0.3615	0.3524	0.5252
+model_name=memnet dataset=SDwH target=trump learning_rate=0.005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4095, f_avg=0.3849, f_against=0.4824, f_favor=0.2512, f_none=0.4211
+0.4095	0.3849	0.4824	0.2512	0.4211
+model_name=aoa dataset=SDwH target=biden learning_rate=1e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4167, f_avg=0.3925, f_against=0.2967, f_favor=0.4894, f_none=0.3913
+0.4167	0.3925	0.2967	0.4894	0.3913
+model_name=aoa dataset=SDwH target=trump learning_rate=1e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4461, f_avg=0.3443, f_against=0.5447, f_favor=0.0, f_none=0.4881
+0.4461	0.3443	0.5447	0.0	0.4881
+model_name=aoa dataset=SDwH target=biden learning_rate=5e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4954, f_avg=0.4774, f_against=0.3663, f_favor=0.5, f_none=0.5657
+0.4954	0.4774	0.3663	0.5	0.5657
+model_name=aoa dataset=SDwH target=trump learning_rate=5e-05 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.5388, f_avg=0.5325, f_against=0.5618, f_favor=0.4828, f_none=0.5529
+0.5388	0.5325	0.5618	0.4828	0.5529
+model_name=aoa dataset=SDwH target=biden learning_rate=0.0001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4907, f_avg=0.4789, f_against=0.4228, f_favor=0.4385, f_none=0.5754
+0.4907	0.4789	0.4228	0.4385	0.5754
+model_name=aoa dataset=SDwH target=trump learning_rate=0.0001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.5151, f_avg=0.5121, f_against=0.4968, f_favor=0.4731, f_none=0.5664
+0.5151	0.5121	0.4968	0.4731	0.5664
+model_name=aoa dataset=SDwH target=biden learning_rate=0.0005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.5139, f_avg=0.5138, f_against=0.5032, f_favor=0.4741, f_none=0.5643
+0.5139	0.5138	0.5032	0.4741	0.5643
+model_name=aoa dataset=SDwH target=trump learning_rate=0.0005 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.444, f_avg=0.3451, f_against=0.5165, f_favor=0.0, f_none=0.5187
+0.444	0.3451	0.5165	0.0	0.5187
+model_name=aoa dataset=SDwH target=biden learning_rate=0.001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4167, f_avg=0.418, f_against=0.4411, f_favor=0.4024, f_none=0.4104
+0.4167	0.418	0.4411	0.4024	0.4104
+model_name=aoa dataset=SDwH target=trump learning_rate=0.001 dropout=0.1 num_epoch=50 batch_size=16 
+micro_f=0.4224, f_avg=0.3279, f_against=0.506, f_favor=0.0, f_none=0.4777
+0.4224	0.3279	0.506	0.0	0.4777

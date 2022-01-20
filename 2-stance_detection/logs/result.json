@@ -1,0 +1,296 @@
+{
+  "SDwH": {
+    "trump": {
+      "lstm": {
+        "macro": {
+          "macro_f1": 0.48748611036179273,
+          "f_favor": 0.46938775510204084,
+          "f_against": 0.52046783625731,
+          "f_none": 0.47260273972602734,
+          "learning_rate": 0.0001,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.5064655172413793,
+          "f_favor": 0.3482587064676617,
+          "f_against": 0.511904761904762,
+          "f_none": 0.5831202046035806,
+          "learning_rate": 5e-05,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        }
+      },
+      "text_cnn": {
+        "macro": {
+          "macro_f1": 0.5519074914976869,
+          "f_favor": 0.5505226480836237,
+          "f_against": 0.528169014084507,
+          "f_none": 0.57703081232493,
+          "learning_rate": 0.0001,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.5538793103448276,
+          "f_favor": 0.5505226480836237,
+          "f_against": 0.528169014084507,
+          "f_none": 0.57703081232493,
+          "learning_rate": 0.0001,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        }
+      },
+      "atae_lstm": {
+        "macro": {
+          "macro_f1": 0.44965246968352557,
+          "f_favor": 0.45714285714285713,
+          "f_against": 0.37551020408163266,
+          "f_none": 0.5163043478260869,
+          "learning_rate": 5e-05,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.45905172413793105,
+          "f_favor": 0.45714285714285713,
+          "f_against": 0.37551020408163266,
+          "f_none": 0.5163043478260869,
+          "learning_rate": 5e-05,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        }
+      },
+      "ian": {
+        "macro": {
+          "macro_f1": 0.32292957651482573,
+          "f_favor": 0.0,
+          "f_against": 0.497584541062802,
+          "f_none": 0.47120418848167533,
+          "learning_rate": 5e-05,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.41594827586206895,
+          "f_favor": 0.0,
+          "f_against": 0.497584541062802,
+          "f_none": 0.47120418848167533,
+          "learning_rate": 5e-05,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        }
+      },
+      "memnet": {
+        "macro": {
+          "macro_f1": 0.5115609571983006,
+          "f_favor": 0.483271375464684,
+          "f_against": 0.4983388704318937,
+          "f_none": 0.5530726256983242,
+          "learning_rate": 5e-05,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.5150862068965517,
+          "f_favor": 0.483271375464684,
+          "f_against": 0.4983388704318937,
+          "f_none": 0.5530726256983242,
+          "learning_rate": 5e-05,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        }
+      },
+      "aoa": {
+        "macro": {
+          "macro_f1": 0.5324991833230773,
+          "f_favor": 0.4827586206896552,
+          "f_against": 0.5617977528089887,
+          "f_none": 0.5529411764705883,
+          "learning_rate": 5e-05,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.5387931034482759,
+          "f_favor": 0.4827586206896552,
+          "f_against": 0.5617977528089887,
+          "f_none": 0.5529411764705883,
+          "learning_rate": 5e-05,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        }
+      }
+    },
+    "biden": {
+      "lstm": {
+        "macro": {
+          "macro_f1": 0.48331597259068887,
+          "f_favor": 0.46905537459283386,
+          "f_against": 0.46212121212121215,
+          "f_none": 0.5187713310580205,
+          "learning_rate": 0.0001,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.4837962962962963,
+          "f_favor": 0.46905537459283386,
+          "f_against": 0.46212121212121215,
+          "f_none": 0.5187713310580205,
+          "learning_rate": 0.0001,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        }
+      },
+      "text_cnn": {
+        "macro": {
+          "macro_f1": 0.5114289835808824,
+          "f_favor": 0.526984126984127,
+          "f_against": 0.43037974683544306,
+          "f_none": 0.5769230769230771,
+          "learning_rate": 5e-05,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.5185185185185185,
+          "f_favor": 0.526984126984127,
+          "f_against": 0.43037974683544306,
+          "f_none": 0.5769230769230771,
+          "learning_rate": 5e-05,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        }
+      },
+      "atae_lstm": {
+        "macro": {
+          "macro_f1": 0.4789159311304421,
+          "f_favor": 0.4794952681388013,
+          "f_against": 0.43200000000000005,
+          "f_none": 0.5252525252525252,
+          "learning_rate": 5e-05,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.48148148148148145,
+          "f_favor": 0.4794952681388013,
+          "f_against": 0.43200000000000005,
+          "f_none": 0.5252525252525252,
+          "learning_rate": 5e-05,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        }
+      },
+      "ian": {
+        "macro": {
+          "macro_f1": 0.4162754303599374,
+          "f_favor": 0.4540229885057472,
+          "f_against": 0.3793103448275862,
+          "f_none": 0.41549295774647893,
+          "learning_rate": 5e-05,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.4212962962962963,
+          "f_favor": 0.4540229885057472,
+          "f_against": 0.3793103448275862,
+          "f_none": 0.41549295774647893,
+          "learning_rate": 5e-05,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        }
+      },
+      "memnet": {
+        "macro": {
+          "macro_f1": 0.5163229573309897,
+          "f_favor": 0.547550432276657,
+          "f_against": 0.47659574468085103,
+          "f_none": 0.524822695035461,
+          "learning_rate": 5e-05,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.5208333333333334,
+          "f_favor": 0.547550432276657,
+          "f_against": 0.47659574468085103,
+          "f_none": 0.524822695035461,
+          "learning_rate": 5e-05,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        }
+      },
+      "aoa": {
+        "macro": {
+          "macro_f1": 0.5138481672451948,
+          "f_favor": 0.4740740740740741,
+          "f_against": 0.5031847133757961,
+          "f_none": 0.5642857142857143,
+          "learning_rate": 0.0005,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.5138888888888888,
+          "f_favor": 0.4740740740740741,
+          "f_against": 0.5031847133757961,
+          "f_none": 0.5642857142857143,
+          "learning_rate": 0.0005,
+          "num_epoch": 50,
+          "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        }
+      }
+    }
+  }
+}

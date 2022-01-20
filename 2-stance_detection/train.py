@@ -6,6 +6,7 @@ import sys
 import time
 from torch.functional import _return_counts
 import tqdm
+import json
 import random
 import numpy as np
 
@@ -73,13 +74,14 @@ class Instructor:
         
         if mode=='0':
             # mode0 写入结果文件中
-            s += f"model_name={self.opt.model_name}\t\
-                   dataset={self.opt.dataset}\t\
-                   target={self.opt.target}\t\
-                   learning_rate={self.opt.learning_rate}\t\
-                   dropout={self.opt.dropout}\t\
-                   num_epoch={self.opt.num_epoch}\t\
-                   batch_size={self.opt.batch_size}\n"
+            s += f"model_name={self.opt.model_name} " + \
+                 f"dataset={self.opt.dataset} " + \
+                 f"target={self.opt.target} " + \
+                 f"learning_rate={self.opt.learning_rate} " + \
+                 f"dropout={self.opt.dropout} " + \
+                 f"num_epoch={self.opt.num_epoch} " + \
+                 f"batch_size={self.opt.batch_size} " + \
+                 "\n"
             s += f"micro_f={micro_f:.4}, f_avg={f_avg:.4}, f_against={f_against:.4}, f_favor={f_favor:.4}, f_none={f_none:.4}\n"
             s += f"{micro_f:.4}\t{f_avg:.4}\t{f_against:.4}\t{f_favor:.4}\t{f_none:.4}\n"
         if mode=='1':
@@ -118,6 +120,8 @@ class Instructor:
         acc = correct_num / total_num
         labels = [i for i in range(opt.polarities_dim)]
 
+        #'micro':通过先计算总体的TP，FN和FP的数量，再计算F1
+        #'macro':分布计算每个类别的F1，然后做平均（各类别F1的权重相同）
         micro_f = metrics.f1_score(t_targets_all.cpu(), torch.argmax(t_outputs_all, -1).cpu(), labels=labels,
                               average='micro')
         f_avg = metrics.f1_score(t_targets_all.cpu(), torch.argmax(t_outputs_all, -1).cpu(), labels=labels,
@@ -130,10 +134,36 @@ class Instructor:
                                   average='macro')
         params = (acc, micro_f, f_avg, f_favor, f_against, f_none)
         if mode=="test":
+            # 写训练日志
             with open(f"logs/_result.txt", "a+") as file:
                 s0 = self.get_log_str(params=params, mode="0")
                 file.write(s0)
-
+            # =====更新最佳结果=====
+            best_macro = {"macro_f1": float(f_avg), "f_favor": float(f_favor), "f_against": float(f_against), "f_none": float(f_none),
+                          "learning_rate": self.opt.learning_rate, "num_epoch": self.opt.num_epoch,
+                          "batch_size": self.opt.batch_size, "dropout": self.opt.dropout, "seed": self.opt.seed}
+            best_micro = {"micro_f1": float(micro_f), "f_favor": float(f_favor), "f_against": float(f_against), "f_none": float(f_none),
+                          "learning_rate": self.opt.learning_rate, "num_epoch": self.opt.num_epoch,
+                          "batch_size": self.opt.batch_size, "dropout": self.opt.dropout, "seed": self.opt.seed}
+            with open(f"logs/result.json", "r") as file:
+                _result = json.load(file)
+            print(_result)
+            if self.opt.dataset not in _result:
+                _result[self.opt.dataset] = {}
+            if self.opt.target not in _result[self.opt.dataset]:
+                _result[self.opt.dataset][self.opt.target] = {}
+            if self.opt.model_name not in _result[self.opt.dataset][self.opt.target]:
+                _result[self.opt.dataset][self.opt.target][self.opt.model_name] = {"macro": {"macro_f1": 0}, "micro": {"micro_f1": 0}}
+            # 按照macro更新
+            if _result[self.opt.dataset][self.opt.target][self.opt.model_name]["macro"]["macro_f1"] < best_macro["macro_f1"]:
+                _result[self.opt.dataset][self.opt.target][self.opt.model_name]["macro"] = best_macro
+            # 按照micro更新
+            if _result[self.opt.dataset][self.opt.target][self.opt.model_name]["micro"]["micro_f1"] < best_micro["micro_f1"]:
+                _result[self.opt.dataset][self.opt.target][self.opt.model_name]["micro"] = best_micro
+            with open(f"logs/result.json", "w") as file:
+                json.dump(_result, file, indent=2)
+            print(_result)
+            # =====更新最佳结果=====end
         s1 = self.get_log_str(params=params, mode="1")
         logger.info(s1)
         # print(f"{round(micro_f*100, 2)}\t{round(f_avg*100, 2)}\t{round(f_against*100,2)}\t{round(f_favor*100,2)}\t{round(f_none*100,2)}")
