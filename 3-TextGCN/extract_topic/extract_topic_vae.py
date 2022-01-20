@@ -8,6 +8,7 @@ import csv
 import json
 import torch
 import tqdm
+import os
 import sys
 sys.path.append('..')
 from settings import DATASET_PATH, CLEAN_CORPUS_PATH
@@ -33,7 +34,7 @@ class Extract_topic_words:
         print("获取数据集中的所有hashtag")
         # self.hashtags 所有标签
         self.hashtags = []
-        with open(f"../{CLEAN_CORPUS_PATH}/{self.taskname}.txt", 'r', encoding='utf-8')as f:
+        with open(f"{CLEAN_CORPUS_PATH}{self.taskname}.txt", 'r', encoding='utf-8')as f:
             lines = f.readlines()
             for line in lines:
                 text = line
@@ -55,7 +56,7 @@ class Extract_topic_words:
         sp = StringProcess()
         re_url = re.compile(r"(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]", flags=0)
 
-        with open(f"{DATASET_PATH}/original/unlabeled/mongo_all.csv", 'r', encoding='utf-8') as f:
+        with open(f"{DATASET_PATH}original/unlabeled/mongo_all.csv", 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for line in tqdm.tqdm(reader):
                 # 去掉网址
@@ -96,7 +97,7 @@ class Extract_topic_words:
                     num_epochs=self.num_epochs, log_every=10, beta=1.0, criterion=self.criterion)
         model.evaluate(test_data=docSet)
         topic_words = model.show_topic_words(topK=10)
-        with open('./temp/test.txt', 'a', encoding='utf-8') as f:
+        with open('temp/test.txt', 'a', encoding='utf-8') as f:
             f.write(f"{hashtag}\n{str(topic_words)}\n")
         # 用训练好的模型将文档中的每一句话对应的topic输出
         txt_lst, embeds = model.get_embed(train_data=docSet, num=len(txtLines)+1)
@@ -105,11 +106,13 @@ class Extract_topic_words:
                 _s = json.dumps(list(t)) + '\n' + json.dumps([float(_) for _ in e])
                 wfp.write(_s + '\n')
         # 存储模型，使用的时候再用load state_dict
-        save_name = f'./temp/state_dict/{raw_hashtag}.model'
+        save_name = f'temp/state_dict/{raw_hashtag}.model'
         torch.save(model.vae.state_dict(),save_name)
 
     def main(self):
         for hashtag in tqdm.tqdm(self.hashtags):
+            if hashtag.lstrip("#") + '.jsonl' in os.listdir('temp/theta'):
+                continue
             self.run(hashtag)
 
 

@@ -15,8 +15,8 @@ import random
 from torch.utils.data import Dataset, dataset
 from transformers import BertTokenizer
 
-DATASET_DIR = '/extend/jt_2/0-dataset'
-PRETRAINED_MODEL_DIR = '/extend/jt_2/pretrained_models/glove.42B.300d.txt'
+DATASET_DIR = '/extend/bishe/0-dataset'
+PRETRAINED_MODEL_DIR = '/extend/bishe/pretrained_models/glove.42B.300d.txt'
 
 # build_tokenizer 创建分词器
 def build_tokenizer(dataset_name, max_seq_len, dat_fname, opt, rebuild=True):

@@ -1,9 +1,13 @@
-ROOT_PATH = "/extend/bishe"
-CLEAN_CORPUS_PATH = "data/clean"
-GRAPH_PATH = "data/graph"
-WORD2ID_PATH = "data/word2id"
-LABEL_PATH = "data/labels"
-DATASET_PATH = ROOT_PATH + "/0-dataset"
+ROOT_PATH = "/extend/bishe/"
+DATASET_PATH = ROOT_PATH + "0-dataset/"
+TextGCN_PATH = ROOT_PATH + "3-TextGCN/"
+
+CLEAN_CORPUS_PATH = TextGCN_PATH + "data/clean/"
+BTM_PATH = TextGCN_PATH + "data/btm/"
+GRAPH_PATH = TextGCN_PATH + "data/graph/"
+WORD2ID_PATH = TextGCN_PATH + "data/word2id/"
+LABEL_PATH = TextGCN_PATH + "data/labels/"
+
 
 
 if __name__ == "__main__":

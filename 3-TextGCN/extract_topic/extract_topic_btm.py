@@ -12,7 +12,9 @@ from biterm.btm import oBTM
 from sklearn.feature_extraction.text import CountVectorizer
 from biterm.utility import vec_to_biterms, topic_summuary
 import os
-from settings import DATASET_PATH, CLEAN_CORPUS_PATH
+import sys
+sys.path.append('..')
+from settings import DATASET_PATH, CLEAN_CORPUS_PATH, BTM_PATH
 
 useless_hashtags = ['#Election2020', '#election2020', '#Elections2020', '#elections2020',
                     '#2020Election', '#2020election', '#2020Elections', '#2020elections',
@@ -37,7 +39,7 @@ class BTM:
         print("获取数据集中的所有hashtag")
         # self.hashtags 所有标签
         self.hashtags = []
-        with open(f"{CLEAN_CORPUS_PATH}/{self.dataset}.txt", 'r', encoding='utf-8')as f:
+        with open(f"{CLEAN_CORPUS_PATH}{self.dataset}.txt", 'r', encoding='utf-8')as f:
             lines = f.readlines()
             for line in lines:
                 text = line
@@ -58,7 +60,7 @@ class BTM:
 
         re_url = re.compile(r"(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]", flags=0)
 
-        with open(f"{DATASET_PATH}/original/unlabeled/mongo_all.csv", 'r', encoding='utf-8') as f:
+        with open(f"{DATASET_PATH}original/unlabeled/mongo_all.csv", 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
             for line in tqdm.tqdm(reader):
                 _text = re.sub(re_url, '', line['full_text'])     
@@ -106,14 +108,14 @@ class BTM:
         return data
 
     def save(self, data):
-        if os.path.exists(f"data/btm/{self.dataset}.json"):
-            with open(f"data/btm/{self.dataset}.json", "r", encoding="utf-8") as f:
+        if os.path.exists(f"{BTM_PATH}{self.dataset}.json"):
+            with open(f"{BTM_PATH}{self.dataset}.json", "r", encoding="utf-8") as f:
                 old_data = json.load(f)
                 old_data.update(data)
-            with open(f"data/btm/{self.dataset}.json", "w", encoding="utf-8") as f:
+            with open(f"{BTM_PATH}{self.dataset}.json", "w", encoding="utf-8") as f:
                 json.dump(old_data, f)
         else:
-            with open(f"data/btm/{self.dataset}.json", "w", encoding="utf-8") as f:
+            with open(f"{BTM_PATH}{self.dataset}.json", "w", encoding="utf-8") as f:
                 json.dump(data, f)
 
 
@@ -125,6 +127,11 @@ class BTM:
             print(f"当前hashtag={hashtag}")
             if hashtag in useless_hashtags:
                 continue
+            # if hashtag exists
+            with open(f"{BTM_PATH}{self.dataset}.json", "r", encoding="utf-8") as f:
+                old_data = json.load(f)
+                if hashtag in old_data:
+                    continue
             try:
                 data = self.train(hashtag)
                 self.save(data)
