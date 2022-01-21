@@ -1,3 +1,8 @@
+import os
+import sys
+sys.path.append('..')
+from data_processor import StringProcess
+from settings import DATASET_PATH, CLEAN_CORPUS_PATH, VAE_PATH
 from curses import raw
 import pickle
 import re
@@ -8,11 +13,8 @@ import csv
 import json
 import torch
 import tqdm
-import os
-import sys
-sys.path.append('..')
-from settings import DATASET_PATH, CLEAN_CORPUS_PATH
-from data_processor import StringProcess
+import threading
+
 
 class Extract_topic_words:
     def __init__(self, args) -> None:
@@ -27,9 +29,11 @@ class Extract_topic_words:
         self.device = args.device
         self._init_get_hashtags()
         self._init_get_unlabeled_texts()
+        self.semaphore = threading.BoundedSemaphore(8)  # 最多允许5个线程同时运行
         self.main()
 
     # get_hashtags 获取数据集中的hashtag
+
     def _init_get_hashtags(self):
         print("获取数据集中的所有hashtag")
         # self.hashtags 所有标签
@@ -54,7 +58,8 @@ class Extract_topic_words:
         # self.unlabeled_texts 所有的unlabeled的文本
         self.unlabeled_texts = []
         sp = StringProcess()
-        re_url = re.compile(r"(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]", flags=0)
+        re_url = re.compile(
+            r"(https?|ftp|file)://[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]", flags=0)
 
         with open(f"{DATASET_PATH}original/unlabeled/mongo_all.csv", 'r', encoding='utf-8') as f:
             reader = csv.DictReader(f)
@@ -63,20 +68,34 @@ class Extract_topic_words:
                 _text = re.sub(re_url, '', line['full_text'])
                 # 去掉@用户
                 _text = re.sub('@\w+', '', _text)
+                # 清理字符串
+                _text = sp.clean_str(_text).strip()
                 # 去掉空格和回车
                 _text = ' '.join(_text.split())
-                # 清理字符串
-                _text = sp.clean_str(_text).strip()     
                 self.unlabeled_texts.append(_text)
-                
 
-    def get_txtLines_from_unlabeled_corpus(self, hashtag):        
+    def get_txtLines_from_unlabeled_corpus(self, hashtag):
         texts = []
         for text in self.unlabeled_texts:
             if hashtag in re.findall('#\w+', text):
-                texts.append(re.sub('#\w+', '', text))
+                # 去掉#hashtag
+                _text = re.sub('#\w+', '', text)
+                # 去掉空格和回车
+                _text = ' '.join(_text.split())
+                texts.append(_text)
         print(f"话题标签{hashtag}对应的unlabeled文本有{len(texts)}条")
         return texts
+
+    def save_json(self, data):
+        if os.path.exists(f"{VAE_PATH}{self.taskname}.json"):
+            with open(f"{VAE_PATH}{self.taskname}.json", "r", encoding="utf-8") as f:
+                old_data = json.load(f)
+                old_data.update(data)
+            with open(f"{VAE_PATH}{self.taskname}.json", "w", encoding="utf-8") as f:
+                json.dump(old_data, f)
+        else:
+            with open(f"{VAE_PATH}{self.taskname}.json", "w", encoding="utf-8") as f:
+                json.dump(data, f)
 
     def run(self, hashtag):
         raw_hashtag = hashtag.lstrip("#")
@@ -96,24 +115,43 @@ class Extract_topic_words:
         model.train(train_data=docSet, batch_size=self.batch_size, test_data=docSet,
                     num_epochs=self.num_epochs, log_every=10, beta=1.0, criterion=self.criterion)
         model.evaluate(test_data=docSet)
+
+        # 存储topic词和词分布
         topic_words = model.show_topic_words(topK=10)
-        with open('temp/test.txt', 'a', encoding='utf-8') as f:
-            f.write(f"{hashtag}\n{str(topic_words)}\n")
-        # 用训练好的模型将文档中的每一句话对应的topic输出
-        txt_lst, embeds = model.get_embed(train_data=docSet, num=len(txtLines)+1)
-        with open(f'temp/theta/{raw_hashtag}.jsonl', 'w', encoding='utf-8') as wfp:
-            for t, e in zip(txt_lst, embeds):
-                _s = json.dumps(list(t)) + '\n' + json.dumps([float(_) for _ in e])
-                wfp.write(_s + '\n')
-        # 存储模型，使用的时候再用load state_dict
-        save_name = f'temp/state_dict/{raw_hashtag}.model'
-        torch.save(model.vae.state_dict(),save_name)
+        topic_distribution = model.show_topic_distribution()
+        self.save_json({hashtag: {"top_words": topic_words,
+                                  "topic_distribution": topic_distribution}
+                        })
+
+        # # 用训练好的模型将文档中的每一句话对应的topic输出
+        # txt_lst, embeds = model.get_embed(
+        #     train_data=docSet, num=len(txtLines)+1)
+        # with open(f'temp/theta/{raw_hashtag}.jsonl', 'w', encoding='utf-8') as wfp:
+        #     for t, e in zip(txt_lst, embeds):
+        #         _s = json.dumps(list(t)) + '\n' + \
+        #             json.dumps([float(_) for _ in e])
+        #         wfp.write(_s + '\n')
+        # # 存储模型，使用的时候再用load state_dict
+        # save_name = f'temp/state_dict/{raw_hashtag}.model'
+        # torch.save(model.vae.state_dict(), save_name)
+
+        self.semaphore.release()  # 释放
 
     def main(self):
+        if not os.path.exists(f"{VAE_PATH}{self.taskname}.json"):
+            with open(f"{VAE_PATH}{self.taskname}.json", 'w') as f:
+                json.dump({}, f)
+
         for hashtag in tqdm.tqdm(self.hashtags):
-            if hashtag.lstrip("#") + '.jsonl' in os.listdir('temp/theta'):
-                continue
-            self.run(hashtag)
+            # if hashtag exists
+            with open(f"{VAE_PATH}{self.taskname}.json", "r", encoding="utf-8") as f:
+                old_data = json.load(f)
+                if hashtag in old_data:
+                    continue
+            # 多线程处理
+            self.semaphore.acquire()  # 加锁
+            t = threading.Thread(target=self.run, args=(hashtag,))  # 这个逗号不能省略
+            t.start()
 
 
 if __name__ == "__main__":

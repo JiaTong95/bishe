@@ -7,6 +7,7 @@ import re
 import numpy as np
 import math
 import tqdm
+import threading
 from collections import Counter
 from biterm.btm import oBTM
 from sklearn.feature_extraction.text import CountVectorizer
@@ -26,12 +27,12 @@ class BTM:
         self.dataset = dataset
         self.topic_num = topic_num
         self.step = step
-
         self.unlabeled_texts = []
-        
+
         # self.result 所有得出的结果，以字典的形式存储，{key: [topic_word1, topic_word2...]}
         self.result = {}
 
+        self.semaphore = threading.BoundedSemaphore(8)  # 最多允许8个线程同时运行
         self.main()
 
     # get_hashtags 获取数据集中的hashtag
@@ -71,7 +72,11 @@ class BTM:
         texts = []
         for text in self.unlabeled_texts:
             if hashtag in re.findall('#\w+', text):
-                texts.append(re.sub('#\w+', '', text))
+                # 去掉空格和回车
+                _text = re.sub('#\w+', '', text)
+                _text = ' '.join(_text.split())
+                texts.append(_text)
+
         return texts
 
     def train(self, hashtag):
@@ -105,7 +110,9 @@ class BTM:
         _topic_summuary['topic_distribution'] = _topic_distribution
 
         data = {hashtag: _topic_summuary}
-        return data
+        self.save(data)
+
+        self.semaphore.release()     #释放
 
     def save(self, data):
         if os.path.exists(f"{BTM_PATH}{self.dataset}.json"):
@@ -133,8 +140,10 @@ class BTM:
                 if hashtag in old_data:
                     continue
             try:
-                data = self.train(hashtag)
-                self.save(data)
+                # 多线程处理
+                self.semaphore.acquire()   #加锁
+                t = threading.Thread(target=self.train, args=(hashtag,)) # 这个逗号不能省略
+                t.start()
             except Exception as e:
                 print(e)
                 continue

@@ -4,6 +4,7 @@ TextGCN_PATH = ROOT_PATH + "3-TextGCN/"
 
 CLEAN_CORPUS_PATH = TextGCN_PATH + "data/clean/"
 BTM_PATH = TextGCN_PATH + "data/btm/"
+VAE_PATH = TextGCN_PATH + "data/vae/"
 GRAPH_PATH = TextGCN_PATH + "data/graph/"
 WORD2ID_PATH = TextGCN_PATH + "data/word2id/"
 LABEL_PATH = TextGCN_PATH + "data/labels/"
