@@ -18,7 +18,7 @@ from sklearn.pipeline import Pipeline
 from tqdm import tqdm
 
 from utils import print_graph_detail
-from settings import *
+from settings import GRAPH_PATH, WORD2ID_PATH, CLEAN_CORPUS_PATH
 
 def get_window(content_lst, window_size):
     """
@@ -90,7 +90,7 @@ def get_pmi_edge(content_lst, window_size=20, threshold=0.):
 
 
 class BuildGraph:
-    def __init__(self, dataset):
+    def __init__(self, dataset, target):
         if not os.path.exists(GRAPH_PATH):
             os.makedirs(GRAPH_PATH)
         if not os.path.exists(WORD2ID_PATH):
@@ -98,11 +98,12 @@ class BuildGraph:
 
         self.word2id = dict()  # 单词映射
         self.dataset = dataset
-        print(f"\n==> 现在的数据集是:{dataset}<==")
+        self.target = target
+        print(f"\n==> 现在的数据集是:{dataset}_{target}<==")
 
         self.g = nx.Graph()
 
-        self.content = f"{CLEAN_CORPUS_PATH}/{dataset}.txt"
+        self.content = f"{CLEAN_CORPUS_PATH}{dataset}_{target}.txt"
 
         self.get_tfidf_edge()
         self.get_pmi_edge()
@@ -175,16 +176,18 @@ class BuildGraph:
 
     def save(self):
         print("total time:", self.pmi_time + self.tfidf_time)
-        nx.write_weighted_edgelist(self.g, f"{GRAPH_PATH}/{self.dataset}.txt")
-        with open(f"{WORD2ID_PATH}/{self.dataset}.json", 'w', encoding='utf-8') as f:
+        nx.write_weighted_edgelist(self.g, f"{GRAPH_PATH}{self.dataset}_{self.target}.txt")
+        with open(f"{WORD2ID_PATH}{self.dataset}_{self.target}.json", 'w', encoding='utf-8') as f:
             json.dump(self.word2id, f, ensure_ascii=False)
         print("\n")
 
 
 def main():
-    BuildGraph("trump")
-    BuildGraph("biden")
-    # BuildGraph("sanders")
+    BuildGraph(dataset="SDwH", target="trump")
+    BuildGraph(dataset="SDwH", target="biden")
+    BuildGraph(dataset="PStance", target="trump")
+    BuildGraph(dataset="PStance", target="biden")
+    BuildGraph(dataset="PStance", target="bernie")
 
 if __name__ == '__main__':
     main()

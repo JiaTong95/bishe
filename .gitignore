@@ -136,6 +136,7 @@ dmypy.json
 /2-stance_detection/state_dict
 /2-stance_detection/dat
 /2-stance_detection/logs/*.log
+/2-stance_detection/logs/*.out
 /3-TextGCN/data
 /3-TextGCN/logs
 /3-TextGCN/extract_topic/temp

@@ -86,42 +86,6 @@ class GSM:
                 loss.backward()
                 optimizer.step()
 
-                trainloss_lst.append(loss.item()/len(bows))
-                epochloss_lst.append(loss.item()/len(bows))
-                if (iter+1) % 10 == 0:
-                    print(
-                        f'Epoch {(epoch+1):>3d}\tIter {(iter+1):>4d}\tLoss:{loss.item()/len(bows):<.7f}\tRec Loss:{rec_loss.item()/len(bows):<.7f}\tKL Div:{kl_div.item()/len(bows):<.7f}')
-            # scheduler.step()
-            if (epoch+1) % log_every == 0:
-                # save_name = f'./ckpt/GSM_{self.taskname}_tp{self.n_topic}_{time.strftime("%Y-%m-%d-%H-%M", time.localtime())}_ep{epoch+1}.ckpt'
-                # checkpoint = {
-                #     "net": self.vae.state_dict(),
-                #     "optimizer": optimizer.state_dict(),
-                #     "epoch": epoch,
-                #     "param": {
-                #         "bow_dim": self.bow_dim,
-                #         "n_topic": self.n_topic,
-                #         "taskname": self.taskname
-                #     }
-                # }
-                # torch.save(checkpoint,save_name)
-                # The code lines between this and the next comment lines are duplicated with WLDA.py, consider to simpify them.
-                print(
-                    f'Epoch {(epoch+1):>3d}\tLoss:{sum(epochloss_lst)/len(epochloss_lst):<.7f}')
-                print('\n'.join([str(lst) for lst in self.show_topic_words()]))
-                print('='*30)
-                smth_pts = smooth_curve(trainloss_lst)
-                plt.plot(np.array(range(len(smth_pts)))*log_every, smth_pts)
-                plt.xlabel('epochs')
-                plt.title('Train Loss')
-                plt.savefig('temp/gsm_trainloss.png')
-                if test_data != None:
-                    c_v, c_w2v, c_uci, c_npmi, mimno_tc, td = self.evaluate(
-                        test_data, calc4each=False)
-                    c_v_lst.append(c_v), c_w2v_lst.append(c_w2v), c_uci_lst.append(
-                        c_uci), c_npmi_lst.append(c_npmi), mimno_tc_lst.append(mimno_tc), td_lst.append(td)
-        scrs = {'c_v': c_v_lst, 'c_w2v': c_w2v_lst, 'c_uci': c_uci_lst,
-                'c_npmi': c_npmi_lst, 'mimno_tc': mimno_tc_lst, 'td': td_lst}
 
     def evaluate(self, test_data, calc4each=False):
         topic_words = self.show_topic_words()
@@ -185,6 +149,7 @@ class GSM:
                 word_dist = F.softmax(word_dist, dim=1)
             return word_dist.detach().cpu().numpy()
 
+    @torch.no_grad()
     def show_topic_words(self, topic_id=None, topK=15, dictionary=None):
         # 将一个n_topic*n_topic的单位矩阵送入decoder中，选出topK个对应的单词作为这n个topic的K个topic_words。
         # 理解为：这个单位矩阵是由n_topic个θ（topic_distribution）组成的，每个向量都代表着概率为1的topic，
@@ -200,7 +165,8 @@ class GSM:
             topic_words.append([self.id2token[idx] for idx in indices[i]])
         
         return topic_words
-    
+        
+    @torch.no_grad()
     def show_topic_distribution(self):
         _input = torch.ones(1, self.bow_dim).to(self.device)
         _, _, _, _theta = self.vae(_input)

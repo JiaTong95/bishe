@@ -49,15 +49,31 @@ class GCN(Module):
         self.v = v
         self.gc1 = GraphConvolution(feat_dim, hid_dim)
         self.gc2 = GraphConvolution(hid_dim, nclass)
+        self.gc_mask = GraphConvolution(hid_dim, 200)
+        self.fc_mask = nn.Linear(200, nclass)
         self.dropout = dropout
 
-    def forward(self, x, adj, adj_topic=None):
-        if adj_topic is not None:
-            adj = adj + adj_topic * self.v
+    def forward(self, x, adj, topic_graph=None, mask_graph=None):
+        # mask是个N*N的矩阵，把除了hashtag以外的都挡住，
+        # option1：mask[i,j]=1 (i=句子，j=hashtag)
+        # option2：mask[i,j]=1 (i=句子，j=hashtag 对应的topic word)
+        if topic_graph is not None:
+            adj = adj + topic_graph * self.v
+
         x = self.gc1(x, adj)
         x = torch.relu(x)
         x = torch.dropout(x, self.dropout, train=self.training)
-        x = self.gc2(x, adj)
+        
+        if mask_graph != None:
+            x = self.gc_mask(x, adj)
+            x = torch.relu(x)
+            mat = torch.mm(mask_graph, x)  # mask=n*n, x=n*hid, mask*x = n*hid
+            mat = F.softmax(mat.sum(-1, keepdim=True), dim=-1)  # mat = n*1
+            x = mat * x  # mat=n*1, x=n*hid, mat*x = n*hid
+            x = self.fc_mask(x)
+        else:
+            x = self.gc2(x, adj)
+                    
         return x
 
 

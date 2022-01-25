@@ -37,7 +37,6 @@ class SpacyTokenizer(object):
 
 class DocDataset(Dataset):
     def __init__(self,
-                 taskname,
                  txtLines,
                  lang="en",
                  tokenizer=None,

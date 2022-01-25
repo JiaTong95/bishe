@@ -8,7 +8,7 @@ from collections import defaultdict
 import numpy as np
 import csv
 import tqdm
-from settings import *
+from settings import CLEAN_CORPUS_PATH, LABEL_PATH, DATASET_PATH
 
 # class StringProcess 处理字符串类
 class StringProcess(object):
@@ -99,10 +99,10 @@ def remove_less_word(lines_str, word_st):
 
         
 class CorpusProcess:
-    def __init__(self, DIR, fname, text_col="Tweet"):
+    def __init__(self, dataset, fname, text_col="Tweet"):
         self.text_col = text_col
-        self.fread = open(f"{DIR}/{fname}", 'r', encoding='utf-8')
-        self.fwrite = open(f"{CLEAN_CORPUS_PATH}/{fname}", 'w', encoding='utf-8')
+        self.fread = open(f"{DATASET_PATH}{dataset}/{fname}", 'r', encoding='utf-8')
+        self.fwrite = open(f"{CLEAN_CORPUS_PATH}{dataset}_{fname}", 'w', encoding='utf-8')
 
         self.clean_text()
 
@@ -163,7 +163,7 @@ def combine_csv_to_txt(train_file, test_file, target):
             reader = csv.DictReader(f)
             for line in reader:
                 corpus.append(line['Tweet'] + '\n')
-    with open(f"{CLEAN_CORPUS_PATH}/{target}.txt", 'w', encoding='utf-8') as f:
+    with open(f"{CLEAN_CORPUS_PATH}{dataset}_{target}.txt", 'w', encoding='utf-8') as f:
         f.writelines(corpus)
 
     labels = []
@@ -181,22 +181,19 @@ def combine_csv_to_txt(train_file, test_file, target):
             Stance = line['Stance']
             s = f"{ID}\ttest\t{Stance}\t{target}\n"
             labels.append(s)
-    with open(f"{LABEL_PATH}/{target}.txt", 'w', encoding='utf-8') as f:
+    with open(f"{LABEL_PATH}{dataset}_{target}.txt", 'w', encoding='utf-8') as f:
         f.writelines(labels)
     print(f"合并{target}的train,test文件，总行数为{len(corpus)}")
 
 
     
 if __name__ == '__main__':
-    CorpusProcess("/extend/jt_2/0-dataset/SDwH", "biden_train.csv")
-    CorpusProcess("/extend/jt_2/0-dataset/SDwH", "biden_test.csv")
-    CorpusProcess("/extend/jt_2/0-dataset/SDwH", "trump_train.csv")
-    CorpusProcess("/extend/jt_2/0-dataset/SDwH", "trump_test.csv")
-
-    combine_csv_to_txt(train_file="data/clean/biden_train.csv",
-                       test_file="data/clean/biden_test.csv",
-                       target="biden")
-    combine_csv_to_txt(train_file="data/clean/trump_train.csv",
-                       test_file="data/clean/trump_test.csv",
-                       target="trump")           
+    params_list = [("SDwH", "trump"), ("SDwH", "biden"), ("PStance", "trump"), ("PStance", "biden"), ("PStance", "bernie")]
+    for dataset, target in params_list:
+        CorpusProcess(dataset=dataset, fname=f"{target}_train.csv")
+        CorpusProcess(dataset=dataset, fname=f"{target}_test.csv")
+        combine_csv_to_txt(train_file=f"{CLEAN_CORPUS_PATH}{dataset}_{target}_train.csv",
+                           test_file=f"{CLEAN_CORPUS_PATH}{dataset}_{target}_test.csv",
+                           target=target)
+    
     # CorpusProcess("/extend/jt_2/0-dataset/original/unlabeled", "mongo_all.csv", 'full_text')

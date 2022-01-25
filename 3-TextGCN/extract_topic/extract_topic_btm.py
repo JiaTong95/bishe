@@ -23,8 +23,9 @@ useless_hashtags = ['#Election2020', '#election2020', '#Elections2020', '#electi
 
 
 class BTM:
-    def __init__(self, dataset, topic_num=5, step=100):
+    def __init__(self, dataset, target, topic_num=5, step=100):
         self.dataset = dataset
+        self.target = target
         self.topic_num = topic_num
         self.step = step
         self.unlabeled_texts = []
@@ -32,7 +33,7 @@ class BTM:
         # self.result 所有得出的结果，以字典的形式存储，{key: [topic_word1, topic_word2...]}
         self.result = {}
 
-        self.semaphore = threading.BoundedSemaphore(8)  # 最多允许8个线程同时运行
+        self.semaphore = threading.BoundedSemaphore(24)  # 最多允许8个线程同时运行
         self.main()
 
     # get_hashtags 获取数据集中的hashtag
@@ -40,7 +41,7 @@ class BTM:
         print("获取数据集中的所有hashtag")
         # self.hashtags 所有标签
         self.hashtags = []
-        with open(f"{CLEAN_CORPUS_PATH}{self.dataset}.txt", 'r', encoding='utf-8')as f:
+        with open(f"{CLEAN_CORPUS_PATH}{self.dataset}_{self.target}.txt", 'r', encoding='utf-8')as f:
             lines = f.readlines()
             for line in lines:
                 text = line
@@ -83,7 +84,11 @@ class BTM:
         # vectorize texts
         vec = CountVectorizer(stop_words='english')
         texts = self.get_texts(hashtag)
-        X = vec.fit_transform(texts).toarray()
+        try:
+            X = vec.fit_transform(texts).toarray()
+        except:
+            self.semaphore.release()     #释放
+            return
 
         # get vocabulary
         vocab = np.array(vec.get_feature_names())
@@ -115,27 +120,30 @@ class BTM:
         self.semaphore.release()     #释放
 
     def save(self, data):
-        if os.path.exists(f"{BTM_PATH}{self.dataset}.json"):
-            with open(f"{BTM_PATH}{self.dataset}.json", "r", encoding="utf-8") as f:
+        if os.path.exists(f"{BTM_PATH}{self.dataset}_{self.target}.json"):
+            with open(f"{BTM_PATH}{self.dataset}_{self.target}.json", "r", encoding="utf-8") as f:
                 old_data = json.load(f)
                 old_data.update(data)
-            with open(f"{BTM_PATH}{self.dataset}.json", "w", encoding="utf-8") as f:
+            with open(f"{BTM_PATH}{self.dataset}_{self.target}.json", "w", encoding="utf-8") as f:
                 json.dump(old_data, f)
         else:
-            with open(f"{BTM_PATH}{self.dataset}.json", "w", encoding="utf-8") as f:
+            with open(f"{BTM_PATH}{self.dataset}_{self.target}.json", "w", encoding="utf-8") as f:
                 json.dump(data, f)
 
 
     def main(self):
         self.get_unlabeled_texts()
         self.get_hashtags()
-
+        
+        if not os.path.exists(f"{BTM_PATH}{self.dataset}_{self.target}.json"):
+            with open(f"{BTM_PATH}{self.dataset}_{self.target}.json", 'w') as f:
+                json.dump({}, f)
         for hashtag in tqdm.tqdm(self.hashtags):
             print(f"当前hashtag={hashtag}")
             if hashtag in useless_hashtags:
                 continue
             # if hashtag exists
-            with open(f"{BTM_PATH}{self.dataset}.json", "r", encoding="utf-8") as f:
+            with open(f"{BTM_PATH}{self.dataset}_{self.target}.json", "r", encoding="utf-8") as f:
                 old_data = json.load(f)
                 if hashtag in old_data:
                     continue
@@ -150,5 +158,5 @@ class BTM:
 
 
 if __name__ == "__main__":
-    btm = BTM("trump")
-    # btm = BTM("biden")
+    # btm = BTM("SDwH", "trump")
+    btm = BTM("PStance", "trump")

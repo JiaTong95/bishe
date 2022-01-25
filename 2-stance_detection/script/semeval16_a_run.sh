@@ -1,6 +1,6 @@
-dataset="PStance"
-target="trump"
-device="cuda:1"
+dataset="semeval16"
+target="a"
+device="cuda:0"
 
 num_epoch=50
 batch_size=16
@@ -21,4 +21,4 @@ done
 
 rm -f ./state_dict/*
 
-# nohup bash script/PStance_trump_run.sh > logs/_PStance_trump.out &
+# nohup bash script/semeval16_a_run.sh > logs/_semeval16_a.out &

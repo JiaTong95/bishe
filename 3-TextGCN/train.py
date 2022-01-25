@@ -3,6 +3,7 @@ import warnings
 from time import time
 
 import tqdm
+import copy
 import json
 import networkx as nx
 import numpy as np
@@ -23,181 +24,257 @@ from utils import read_file
 from utils import return_seed
 import datetime
 
+from settings import BTM_PATH, VAE_PATH, GRAPH_PATH, LABEL_PATH, WORD2ID_PATH, CLEAN_CORPUS_PATH
+
 torch.backends.cudnn.deterministic = True
 torch.backends.cudnn.benchmark = True
 warnings.filterwarnings("ignore")
 
 
-def get_train_test(target_fn):
-    train_lst = list()
-    test_lst = list()
-    with read_file(target_fn, mode="r") as fin:
-        for indx, item in enumerate(fin):
-            if item.split("\t")[1] in {"train", "training", "20news-bydate-train"}:
-                train_lst.append(indx)
-            else:
-                test_lst.append(indx)
+def timer(function):
+    """
+    装饰器函数timer
+    """
+    def wrapper(*args, **kwargs):
+        time_start = time()
+        res = function(*args, **kwargs)
+        cost_time = time() - time_start
+        print("【%s】运行时间：【%s】秒" % (function.__name__, cost_time))
+        return res
 
-    return train_lst, test_lst
+    return wrapper
 
 
 class PrepareData:
-    def __init__(self, args):
-        print("prepare data")
-        self.graph_path = "data/graph"
-        self.args = args
+    def __init__(self, opt):
+        self.opt = opt
+        self.Get_Graph()
+        self.Get_Topic_Graph_And_Mask_Graph()
+        self.Get_Features()
+        self.Get_Trainset_Testset_Split()
+        self.Get_Text_Indices()
+        self.Get_NClass()
 
-        # graph
-        graph = nx.read_weighted_edgelist(f"{self.graph_path}/{args.dataset}.txt"
-                                          , nodetype=int)
-        print_graph_detail(graph)
-        adj = nx.to_scipy_sparse_matrix(graph,
-                                        nodelist=list(range(graph.number_of_nodes())),
+    # Get_Graph 获取图(邻接矩阵)
+    def Get_Graph(self):
+        self.graph = nx.read_weighted_edgelist(
+            f"{GRAPH_PATH}{self.opt.dataset}_{self.opt.target}.txt", nodetype=int)
+        print_graph_detail(self.graph)
+        # 转换成networkx库可以处理的格式
+        adj = nx.to_scipy_sparse_matrix(self.graph,
+                                        nodelist=list(
+                                            range(self.graph.number_of_nodes())),
                                         weight='weight',
                                         dtype=np.float)
 
+        # 非对称矩阵转换成对称矩阵
         adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj)
 
         self.adj = preprocess_adj(adj, is_sparse=True)
 
-        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+    # Get_Topic_Graph_And_Mask_Graph 获取主题矩阵和mask矩阵(mask是个N*N的矩阵，把除了hashtag以外的都挡住，)
+    def Get_Topic_Graph_And_Mask_Graph(self):
+        self.topic_graph = None
+        self.mask_graph = None
 
-        # features
-        self.nfeat_dim = graph.number_of_nodes()
-        row = list(range(self.nfeat_dim))
-        col = list(range(self.nfeat_dim))
-        value = [1.] * self.nfeat_dim
-        shape = (self.nfeat_dim, self.nfeat_dim)
-        indices = torch.from_numpy(
-            np.vstack((row, col)).astype(np.int64))
+        if self.opt.topic_by == "btm":
+            TOPIC_PATH = BTM_PATH
+        elif self.opt.topic_by == "vae":
+            TOPIC_PATH = VAE_PATH
+        else:
+            return
+
+        # 获取topic_graph
+        _topic_graph = nx.read_weighted_edgelist(
+            f"{TOPIC_PATH}{self.opt.dataset}_{self.opt.target}_graph.txt", nodetype=int)
+        self.topic_graph = nx.to_scipy_sparse_matrix(_topic_graph,
+                                                     nodelist=list(range(_topic_graph.number_of_nodes())),
+                                                     weight='weight',
+                                                     dtype=np.float32)
+        self.topic_graph = preprocess_adj(
+            self.topic_graph, is_sparse=True, plus_I=False)
+
+        # 获取mask
+        if self.opt.mask == True:
+            _mask_graph = nx.read_weighted_edgelist(
+                f"{TOPIC_PATH}{self.opt.dataset}_{self.opt.target}_mask.txt", nodetype=int)
+            _mask_graph = nx.to_scipy_sparse_matrix(_mask_graph,
+                                                    nodelist=list(
+                                                        range(_mask_graph.number_of_nodes())),
+                                                    weight='weight',
+                                                    dtype=np.float32)
+            # 非对称矩阵变为对称矩阵
+            _mask_graph = _mask_graph + _mask_graph.T.multiply(
+                _mask_graph.T > _mask_graph) - _mask_graph.multiply(_mask_graph.T > _mask_graph)
+            self.mask_graph = preprocess_adj(
+                _mask_graph, is_sparse=True, plus_I=False)
+
+    # Get_Features 获取初始训练特征
+    def Get_Features(self):
+        """
+            (应该是)一个NxN的单位矩阵，转成了稀疏方式存储
+        """
+        self.feat_dim = self.graph.number_of_nodes()
+        row = list(range(self.feat_dim))
+        col = list(range(self.feat_dim))
+        value = [1.] * self.feat_dim
+        shape = (self.feat_dim, self.feat_dim)
+        indices = torch.from_numpy(np.vstack((row, col)).astype(np.int64))
         values = torch.FloatTensor(value)
         shape = torch.Size(shape)
 
         self.features = torch.sparse.FloatTensor(indices, values, shape)
 
-        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        # target
+    # Get_Trainset_Testset_Split 获取训练集、验证集和数据集
+    def Get_Trainset_Testset_Split(self):
+        from sklearn.model_selection import train_test_split
 
-        target_fn = f"data/text_dataset/{self.args.dataset}.txt"
-        target = np.array(pd.read_csv(target_fn,
-                                      sep="\t",
-                                      header=None)[2])
-        target2id = {label: indx for indx, label in enumerate(set(target))}
-        self.target = [target2id[label] for label in target]
-        self.nclass = len(target2id)
+        self.train_list, self.test_list = [], []
+        fname = f"{LABEL_PATH}{self.opt.dataset}_{self.opt.target}.txt"
+        with read_file(fname, 'r', encoding='utf-8') as f:
+            for indx, item in enumerate(f):
+                if item.split("\t")[1] in ["train", "training", "20news-bydate-train"]:
+                    self.train_list.append(indx)
+                else:
+                    self.test_list.append(indx)
 
-        # <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
-        # train val test split
+        self.train_list, self.val_list = train_test_split(self.train_list,
+                                                          test_size=self.opt.val_ratio,
+                                                          shuffle=True)
 
-        self.train_lst, self.test_lst = get_train_test(target_fn)
-
-        with open(f"data/word2id/{self.args.dataset}.json", 'r', encoding='utf-8') as f:
+    # Get_Text_Indices 获取词标记
+    def Get_Text_Indices(self):
+        with open(f"{WORD2ID_PATH}{self.opt.dataset}_{self.opt.target}.json", 'r', encoding='utf-8') as f:
             self.word2id = json.load(f)
-
-        self.text_indices = self.get_text_indices()
-
-    def get_text_indices(self):
-        text_indices = []
-        with open(f"data/text_dataset/clean_corpus/{self.args.dataset}.txt", 'r', encoding='utf-8') as f:
+        self.text_indices = []
+        with open(f"{CLEAN_CORPUS_PATH}{self.opt.dataset}_{self.opt.target}.txt", 'r', encoding='utf-8') as f:
             lines = f.readlines()
             for line in lines:
                 line_indices = []
                 for word in line.split():
                     line_indices.append(self.word2id[word])
-                text_indices.append(line_indices)
-        return text_indices
+                self.text_indices.append(line_indices)
+
+    # Get_NClass 获取标签种类数量
+    def Get_NClass(self):
+        y_fname = f"{LABEL_PATH}{self.opt.dataset}_{self.opt.target}.txt"
+        y = np.array(pd.read_csv(y_fname,
+                                      sep="\t",
+                                      header=None)[2])
+        y2id = {label: indx for indx, label in enumerate(set(y))}
+        self.y = [y2id[label] for label in y]
+        self.nclass = len(y2id)
 
 
-class TextGCNTrainer:
-    def __init__(self, args, model, pre_data: PrepareData):
-        self.args = args
-        self.model = model
-        self.device = args.device
+class Instructor:
+    def __init__(self, opt):
+        self.Init_parameters(opt)
+        self.data = PrepareData(opt)
 
-        self.max_epoch = self.args.max_epoch
-        self.set_seed()
+    # 初始化参数
+    def Init_parameters(self, opt):
+        self.dataset = opt.dataset
+        self.target = opt.target
+        self.device = opt.device
+        self.dropout = opt.dropout
+        self.early_stopping = opt.early_stopping
+        self.hid_dim = opt.hid_dim
+        self.learning_rate = opt.learning_rate
+        self.mask = opt.mask
+        self.max_epoch = opt.max_epoch
+        self.seed = opt.seed
+        self.topic_by = opt.topic_by
+        self.v = opt.v
+        self.val_ratio = opt.val_ratio
 
-        self.dataset = args.dataset
-        self.predata = pre_data
-        self.earlystopping = EarlyStopping(args.early_stopping)
+    # 深拷贝数据，节省磁盘IO时间
+    def Copy_data(self):
+        copy_data = copy.deepcopy(self.data)
+        self.feat_dim = copy_data.feat_dim
+        self.nclass = copy_data.nclass
+        self.adj = copy_data.adj
+        self.features = copy_data.features
+        self.y = copy_data.y
+        self.train_list = copy_data.train_list
+        self.val_list = copy_data.val_list
+        self.test_list = copy_data.test_list
+        self.topic_graph = copy_data.topic_graph
+        self.mask_graph = copy_data.mask_graph
 
-    def set_seed(self):
-        torch.manual_seed(self.args.seed)
-        np.random.seed(self.args.seed)
-
-    def fit(self):
-        self.prepare_data()
-        self.model = self.model(nfeat=self.nfeat_dim,
-                                nhid=self.args.nhid,
-                                nclass=self.nclass,
-                                dropout=self.args.dropout)
-        # print(self.model.parameters)
-        self.model = self.model.to(self.device)
-
-        self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.args.lr)
-        self.criterion = torch.nn.CrossEntropyLoss()
-
-        self.model_param = sum(param.numel() for param in self.model.parameters())
-        # print('# model parameters:', self.model_param)
-        self.convert_tensor()
-
-        start = time()
-        self.train()
-        self.train_time = time() - start
-
-    @classmethod
-    def set_description(cls, desc):
-        string = ""
-        for key, value in desc.items():
-            if isinstance(value, int):
-                string += f"{key}:{value} "
-            else:
-                string += f"{key}:{value:.4f} "
-        print(string)
-
-    def prepare_data(self):
-        self.adj = self.predata.adj
-        self.nfeat_dim = self.predata.nfeat_dim
-        self.features = self.predata.features
-        self.target = self.predata.target
-        self.nclass = self.predata.nclass
-        self.text_indices = self.predata.text_indices
-
-        self.train_lst, self.val_lst = train_test_split(self.predata.train_lst,
-                                                        test_size=self.args.val_ratio,
-                                                        shuffle=True,
-                                                        random_state=self.args.seed)
-        self.test_lst = self.predata.test_lst
-
-    def convert_tensor(self):
+    # Convert_tensor 转换tensor
+    def Convert_tensor(self):
         self.model = self.model.to(self.device)
         self.adj = self.adj.to(self.device)
         self.features = self.features.to(self.device)
-        self.target = torch.tensor(self.target).long().to(self.device)
-        self.train_lst = torch.tensor(self.train_lst).long().to(self.device)
-        self.val_lst = torch.tensor(self.val_lst).long().to(self.device)
+        self.y = torch.tensor(self.y).long().to(self.device)
+        self.train_list = torch.tensor(self.train_list).long().to(self.device)
+        self.val_list = torch.tensor(self.val_list).long().to(self.device)
+        self.test_list = torch.tensor(self.test_list).long().to(self.device)
+        if self.topic_graph != None:
+            self.topic_graph = self.topic_graph.to(self.device)
+        if self.mask_graph != None:
+            self.mask_graph = self.mask_graph.to(self.device)
+
+    # Set_seed 设置种子
+    def Set_seed(self, seed):
+        self.seed = seed
+        torch.manual_seed(seed)
+        np.random.seed(seed)
+
+    # Get_Model 获取模型
+    def Get_Model(self):
+        self.model = GCN(feat_dim=self.feat_dim,
+                         hid_dim=self.hid_dim,
+                         nclass=self.nclass,
+                         dropout=self.dropout,
+                         v=self.v)
+
+        self.optimizer = torch.optim.Adam(
+            self.model.parameters(), lr=self.learning_rate)
+        self.criterion = torch.nn.CrossEntropyLoss()
+
+    # Record 记录实验结果
+    def Record(self):
+        from prettytable import PrettyTable
+        table = PrettyTable()
+        for key, value_list in self.result.items():
+            min_v = f"min:{float(np.min(value_list)):.4}"
+            max_v = f"max:{float(np.max(value_list)):.4}"
+            mean = f"mean:{float(np.mean(value_list)):.4}"
+            value_list = [f"{float(x):.4}" for x in value_list]
+            value_list.extend([min_v, max_v, mean])
+            table.add_column(key, value_list)
+        print(table)
+        suffix = ""
+        if self.topic_by != "":
+            suffix += "_" + self.topic_by
+        if self.mask == True:
+            suffix += "_mask"
+        with open(f"logs/{self.dataset}_{self.target}{suffix}.log", 'w') as f:
+            f.write(table.__str__())
 
     def train(self):
+        self.earlystopping = EarlyStopping(self.early_stopping)
         for epoch in range(self.max_epoch):
             self.model.train()
             self.optimizer.zero_grad()
 
-            logits = self.model.forward(self.features, self.adj)
-            loss = self.criterion(logits[self.train_lst],
-                                  self.target[self.train_lst])
+            logits = self.model(x=self.features, adj=self.adj,
+                                topic_graph=self.topic_graph, mask_graph=self.mask_graph)
+            loss = self.criterion(logits[self.train_list],
+                                  self.y[self.train_list])
 
             loss.backward()
             self.optimizer.step()
 
-            val_desc = self.val(self.val_lst)
+            val_desc = self.val(self.val_list)
 
             desc = dict(**{"epoch": epoch,
                            "train_loss": loss.item(),
                            }, **val_desc)
 
-            # self.set_description(desc)
-
             if self.earlystopping(val_desc["val_loss"]):
+                # print(f"epoch={epoch}, earlystopping...")
                 break
 
     @torch.no_grad()
@@ -206,31 +283,33 @@ class TextGCNTrainer:
         with torch.no_grad():
             logits = self.model.forward(self.features, self.adj)
             loss = self.criterion(logits[x],
-                                  self.target[x])
+                                  self.y[x])
             acc = accuracy(logits[x],
-                           self.target[x])
-            precision, recall, _, _ = precision_recall_fscore_support(y_true=self.target[x].cpu(),
-                                                                      y_pred=torch.argmax(logits[x], -1).cpu(),
-                                                                      labels=[0, 1, 2],
+                           self.y[x])
+            precision, recall, _, _ = precision_recall_fscore_support(y_true=self.y[x].cpu(),
+                                                                      y_pred=torch.argmax(
+                                                                          logits[x], -1).cpu(),
+                                                                      labels=[
+                                                                          0, 1, 2],
                                                                       average='macro')
-            micro_f1 = f1_score(y_true=self.target[x].cpu(),
+            micro_f1 = f1_score(y_true=self.y[x].cpu(),
                                 y_pred=torch.argmax(logits[x], -1).cpu(),
                                 labels=[0, 1, 2],
                                 average='micro')
-            macro_f1 = f1_score(y_true=self.target[x].cpu(),
+            macro_f1 = f1_score(y_true=self.y[x].cpu(),
                                 y_pred=torch.argmax(logits[x], -1).cpu(),
                                 labels=[0, 1, 2],
                                 average='macro')
 
-            f_against = f1_score(y_true=self.target[x].cpu(),
+            f_against = f1_score(y_true=self.y[x].cpu(),
                                  y_pred=torch.argmax(logits[x], -1).cpu(),
                                  labels=[0],
                                  average='macro')
-            f_favor = f1_score(y_true=self.target[x].cpu(),
+            f_favor = f1_score(y_true=self.y[x].cpu(),
                                y_pred=torch.argmax(logits[x], -1).cpu(),
                                labels=[2],
                                average='macro')
-            f_none = f1_score(y_true=self.target[x].cpu(),
+            f_none = f1_score(y_true=self.y[x].cpu(),
                               y_pred=torch.argmax(logits[x], -1).cpu(),
                               labels=[1],
                               average='macro')
@@ -252,51 +331,41 @@ class TextGCNTrainer:
 
     @torch.no_grad()
     def test(self):
-        self.test_lst = torch.tensor(self.test_lst).long().to(self.device)
-        test_desc = self.val(self.test_lst, prefix="test")
-        test_desc["train_time"] = self.train_time
-        test_desc["model_param"] = self.model_param
-        return test_desc
+        self.test_list = torch.tensor(self.test_list).long().to(self.device)
+        test_desc = self.val(self.test_list, prefix="test")
+        # test_desc["seed"] = self.seed
+        for key, value in test_desc.items():
+            if key not in self.result:
+                self.result[key] = []
+            self.result[key].append(value)
+        self.result["learning_rate"].append(self.learning_rate)
+        self.result["dropout"].append(self.dropout)
+        self.result["v"].append(self.v)
+
+    @timer
+    def main(self):
+        self.result = {"learning_rate": [], "dropout": [], "v": []}
+        learning_rate_list = [0.01, 0.02, 0.03, 0.05, 0.001,
+                              0.002, 0.003, 0.005, 0.0001, 0.0002, 0.0003]
+        dropout_list = [0, 0.1, 0.2, 0.3, 0.4, 0.5]
+        v_list = [0] if self.topic_by == "" else [x/10 for x in range(11)]
+        for learning_rate in tqdm.tqdm(learning_rate_list):
+            self.learning_rate = learning_rate
+            for dropout in dropout_list:
+                self.dropout = dropout
+                for v in v_list:
+                    self.v = v
+                    self.Copy_data()
+                    self.Set_seed(self.seed)
+                    self.Get_Model()
+                    self.Convert_tensor()
+                    self.train()
+                    self.test()
+        self.Record()
 
 
-def main(times):
-    args = parameter_parser()
-
-    model = GCN
-
-    print(args)
-
-    predata = PrepareData(args)
-    cudause = CudaUse()
-
-    record = LogResult()
-    seed_lst = list()
-    for ind, seed in tqdm.tqdm(enumerate(return_seed(args.times))):
-        print(f"==> {ind}, seed:{seed}")
-        args.seed = seed
-        seed_lst.append(seed)
-
-        framework = TextGCNTrainer(model=model, args=args, pre_data=predata)
-        framework.fit()
-
-        if torch.cuda.is_available():
-            gpu_mem = cudause.gpu_mem_get(_id=0)
-            record.log_single(key="gpu_mem", value=gpu_mem)
-
-        record.log(framework.test())
-
-        del framework
-        gc.collect()
-
-        if torch.cuda.is_available():
-            torch.cuda.empty_cache()
-
-    print("==> seed set:")
-    print(seed_lst)
-    s = record.show_str()
-    with open(f'logs/{args.dataset}{datetime.datetime.strftime(datetime.datetime.now(), "%m%d%H%M")}.txt', 'w') as f:
-        f.write(s)
-
-
-if __name__ == '__main__':
-    main()
+if __name__ == "__main__":
+    opt = parameter_parser()
+    print(opt)
+    ins = Instructor(opt)
+    ins.main()

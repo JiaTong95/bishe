@@ -7,7 +7,7 @@ batch_size=16
 seed=2020
 dropout=0.1
 
-model_names=("lstm" "text_cnn" "atae_lstm" "ian" "memnet" "aoa" "bert_spc" "aen_bert" "lcf_bert")
+model_names=("lstm" "text_cnn" "atae_lstm" "ian" "memnet" "aoa" "bert_spc" "aen_bert")
 
 learning_rates=("1e-5" "5e-5" "1e-4" "5e-4" "1e-3" "5e-3")
 
@@ -21,4 +21,4 @@ done
 
 rm -f ./state_dict/*
 
-# nohup bash script/PStance_bernie_run.sh > logs/_PStance_bernie.log &
+# nohup bash script/PStance_bernie_run.sh > logs/_PStance_bernie.out &

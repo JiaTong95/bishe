@@ -86,11 +86,11 @@ def return_seed(nums=10):
     return seed
 
 
-def preprocess_adj(adj, is_sparse=False, plus_e=True):
+def preprocess_adj(adj, is_sparse=False, plus_I=True):
     """Preprocessing of adjacency matrix for simple pygGCN model and conversion to
     tuple representation."""
     # 加上单位矩阵
-    if plus_e:
+    if plus_I:
         adj = adj + sp.eye(adj.shape[0])
     adj_normalized = normalize_adj(adj)
     if is_sparse:
@@ -155,7 +155,8 @@ class EarlyStopping:
         elif score < self.best_score + self.delta:
             self.counter += 1
             if self.verbose:
-                print(f'EarlyStopping counter: {self.counter} out of {self.patience}')
+                print(
+                    f'EarlyStopping counter: {self.counter} out of {self.patience}')
             if self.counter >= self.patience:
                 self.early_stop = True
                 return True
@@ -182,16 +183,21 @@ def parameter_parser():
     The default hyperparameters give a good quality representation without grid search.
     """
     parser = argparse.ArgumentParser(description="Run .")
-    parser.add_argument('--lr', type=float, default=0.02)
-    parser.add_argument('--dropout', type=float, default=0.5)
-    parser.add_argument('--hid_dim', type=int, default=200)
-    parser.add_argument('--max_epoch', type=int, default=200)
-    parser.add_argument('--val_ratio', type=float, default=0.1)
-    parser.add_argument('--early_stopping', type=int, default=10)
+
+    parser.add_argument('--dataset', type=str, default="SDwH")
     parser.add_argument('--device', type=str, default='cuda:0')
-    parser.add_argument('--seed_num', type=int, default=10)
+    parser.add_argument('--dropout', type=float, default=0.5)
+    parser.add_argument('--early_stopping', type=int, default=10)
+    parser.add_argument('--hid_dim', type=int, default=200)
+    parser.add_argument('--learning_rate', type=float, default=0.02)
+    parser.add_argument('--mask', action="store_true")  # 默认不输入就是False
+    parser.add_argument('--max_epoch', type=int, default=200)
+    parser.add_argument('--seed', type=int, default=2020)
+    parser.add_argument('--target', type=str, default="trump")
+    parser.add_argument('--topic_by', type=str, default="", help="btm, vae or (empty)")
     parser.add_argument('--v', type=float, default=0)
-    parser.add_argument('--dataset', type=str, default="trump")
+    parser.add_argument('--val_ratio', type=float, default=0.1)
+
     return parser.parse_args()
 
 
@@ -234,6 +240,7 @@ class LogResult:
         print(table)
         return table.__str__()
 
+
 class CudaUse(object):
     def __init__(self):
         self.cuda_available = th.cuda.is_available()
@@ -243,7 +250,8 @@ class CudaUse(object):
 
     def get_cuda_id(self):
         if self.cuda_available:
-            gpu_mem = sorted(self.gpu_mem_get_all(), key=lambda item: item.free, reverse=True)
+            gpu_mem = sorted(self.gpu_mem_get_all(),
+                             key=lambda item: item.free, reverse=True)
             low_use_id = gpu_mem[0].id
             return th.device(f'cuda:{low_use_id}')
         else:
@@ -252,19 +260,3 @@ class CudaUse(object):
     def gpu_mem_get_all(self):
         "get total, used and free memory (in MBs) for each available gpu"
         return list(map(self.gpu_mem_get, range(self.pynvml.nvmlDeviceGetCount())))
-
-    def gpu_mem_get(self, _id=None):
-        """get total, used and free memory (in MBs) for gpu `id`. if `id` is not passed,
-        currently selected torch device is used"""
-        from collections import namedtuple
-        GPUMemory = namedtuple('GPUMemory', ['total', 'free', 'used', 'id'])
-
-        if _id is None:
-            _id = th.cuda.current_device()
-        try:
-            handle = self.pynvml.nvmlDeviceGetHandleByIndex(_id)
-            info = self.pynvml.nvmlDeviceGetMemoryInfo(handle)
-            # return GPUMemory(*(map(b2mb, [info.total, info.free, info.used])), id=_id)
-            return b2mb(info.used)
-        except:
-            return GPUMemory(0, 0, 0, -1)

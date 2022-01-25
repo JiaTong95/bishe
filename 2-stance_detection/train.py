@@ -139,13 +139,18 @@ class Instructor:
                 s0 = self.get_log_str(params=params, mode="0")
                 file.write(s0)
             # =====更新最佳结果=====
-            best_macro = {"macro_f1": float(f_avg), "f_favor": float(f_favor), "f_against": float(f_against), "f_none": float(f_none),
+            best_macro = {"macro_f1": float(f_avg), "micro_f1": float(micro_f), 
+                          "f_favor": float(f_favor), "f_against": float(f_against), "f_none": float(f_none),
                           "learning_rate": self.opt.learning_rate, "num_epoch": self.opt.num_epoch,
                           "batch_size": self.opt.batch_size, "dropout": self.opt.dropout, "seed": self.opt.seed}
-            best_micro = {"micro_f1": float(micro_f), "f_favor": float(f_favor), "f_against": float(f_against), "f_none": float(f_none),
+            best_micro = {"micro_f1": float(micro_f), "macro_f1": float(f_avg),
+                          "f_favor": float(f_favor), "f_against": float(f_against), "f_none": float(f_none),
                           "learning_rate": self.opt.learning_rate, "num_epoch": self.opt.num_epoch,
                           "batch_size": self.opt.batch_size, "dropout": self.opt.dropout, "seed": self.opt.seed}
-            with open(f"logs/result.json", "r") as file:
+            if not os.path.exists('result.json'):
+                with open(f"result.json", "w") as file:
+                    json.dump({}, file)
+            with open(f"result.json", "r") as file:
                 _result = json.load(file)
             print(_result)
             if self.opt.dataset not in _result:
@@ -160,7 +165,7 @@ class Instructor:
             # 按照micro更新
             if _result[self.opt.dataset][self.opt.target][self.opt.model_name]["micro"]["micro_f1"] < best_micro["micro_f1"]:
                 _result[self.opt.dataset][self.opt.target][self.opt.model_name]["micro"] = best_micro
-            with open(f"logs/result.json", "w") as file:
+            with open(f"result.json", "w") as file:
                 json.dump(_result, file, indent=2)
             print(_result)
             # =====更新最佳结果=====end
@@ -426,7 +431,7 @@ if __name__ == '__main__':
     opt.device = torch.device('cuda' if torch.cuda.is_available() else 'cpu') \
         if opt.device is None else torch.device(opt.device)
 
-    log_file = 'logs/{}-{}-{}.log'.format(opt.model_name, opt.dataset, time.strftime("%Y-%m-%d-%H%M", time.localtime()))
+    log_file = 'logs/{}-{}.log'.format(opt.dataset, opt.model_name)
     logger.addHandler(logging.FileHandler(log_file))
 
     ins = Instructor(opt)

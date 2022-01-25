@@ -18,7 +18,8 @@ import threading
 
 class Extract_topic_words:
     def __init__(self, args) -> None:
-        self.taskname = args.taskname
+        self.dataset = args.dataset
+        self.target = args.target
         self.no_below = args.no_below
         self.no_above = args.no_above
         self.num_epochs = args.num_epochs
@@ -29,7 +30,7 @@ class Extract_topic_words:
         self.device = args.device
         self._init_get_hashtags()
         self._init_get_unlabeled_texts()
-        self.semaphore = threading.BoundedSemaphore(8)  # 最多允许5个线程同时运行
+        self.semaphore = threading.BoundedSemaphore(1)  # 最多允许n个线程同时运行
         self.main()
 
     # get_hashtags 获取数据集中的hashtag
@@ -38,7 +39,7 @@ class Extract_topic_words:
         print("获取数据集中的所有hashtag")
         # self.hashtags 所有标签
         self.hashtags = []
-        with open(f"{CLEAN_CORPUS_PATH}{self.taskname}.txt", 'r', encoding='utf-8')as f:
+        with open(f"{CLEAN_CORPUS_PATH}{self.dataset}_{self.target}.txt", 'r', encoding='utf-8')as f:
             lines = f.readlines()
             for line in lines:
                 text = line
@@ -87,68 +88,71 @@ class Extract_topic_words:
         return texts
 
     def save_json(self, data):
-        if os.path.exists(f"{VAE_PATH}{self.taskname}.json"):
-            with open(f"{VAE_PATH}{self.taskname}.json", "r", encoding="utf-8") as f:
+        if os.path.exists(f"{VAE_PATH}{self.dataset}_{self.target}.json"):
+            with open(f"{VAE_PATH}{self.dataset}_{self.target}.json", "r", encoding="utf-8") as f:
                 old_data = json.load(f)
                 old_data.update(data)
-            with open(f"{VAE_PATH}{self.taskname}.json", "w", encoding="utf-8") as f:
+            with open(f"{VAE_PATH}{self.dataset}_{self.target}.json", "w", encoding="utf-8") as f:
                 json.dump(old_data, f)
         else:
-            with open(f"{VAE_PATH}{self.taskname}.json", "w", encoding="utf-8") as f:
+            with open(f"{VAE_PATH}{self.dataset}_{self.target}.json", "w", encoding="utf-8") as f:
                 json.dump(data, f)
 
     def run(self, hashtag):
-        raw_hashtag = hashtag.lstrip("#")
-        txtLines = self.get_txtLines_from_unlabeled_corpus(hashtag)
-        docSet = DocDataset(taskname=self.taskname, txtLines=txtLines,
-                            no_below=self.no_below, no_above=self.no_above, use_tfidf=False)
-        if self.auto_adj:
-            no_above = docSet.topk_dfs(topk=20)
-            docSet = DocDataset(self.taskname, no_below=self.no_below,
-                                no_above=no_above, use_tfidf=False)
+        try:
+            raw_hashtag = hashtag.lstrip("#")
+            txtLines = self.get_txtLines_from_unlabeled_corpus(hashtag)
+                
+            docSet = DocDataset(txtLines=txtLines, no_below=self.no_below, no_above=self.no_above, use_tfidf=False)
+            if self.auto_adj:
+                no_above = docSet.topk_dfs(topk=20)
+                docSet = DocDataset(no_below=self.no_below, no_above=no_above, use_tfidf=False)
 
-        voc_size = docSet.vocabsize
-        print('voc size:', voc_size)
+            voc_size = docSet.vocabsize
+            print('voc size:', voc_size)
 
-        model = GSM(bow_dim=voc_size, n_topic=self.n_topic,
-                    taskname=self.taskname, device=self.device)
-        model.train(train_data=docSet, batch_size=self.batch_size, test_data=docSet,
-                    num_epochs=self.num_epochs, log_every=10, beta=1.0, criterion=self.criterion)
-        model.evaluate(test_data=docSet)
+            model = GSM(bow_dim=voc_size, n_topic=self.n_topic,
+                        taskname=f"{self.dataset}_{self.target}", device=self.device)
+            model.train(train_data=docSet, batch_size=self.batch_size, test_data=docSet,
+                        num_epochs=self.num_epochs, log_every=10, beta=1.0, criterion=self.criterion)
+            model.evaluate(test_data=docSet)
 
-        # 存储topic词和词分布
-        topic_words = model.show_topic_words(topK=10)
-        topic_distribution = model.show_topic_distribution()
-        self.save_json({hashtag: {"top_words": topic_words,
-                                  "topic_distribution": topic_distribution}
-                        })
+            # 存储topic词和词分布
+            topic_words = model.show_topic_words(topK=10)
+            topic_distribution = model.show_topic_distribution()
+            self.save_json({hashtag: {"top_words": topic_words,
+                                    "topic_distribution": topic_distribution}
+                            })
 
-        # # 用训练好的模型将文档中的每一句话对应的topic输出
-        # txt_lst, embeds = model.get_embed(
-        #     train_data=docSet, num=len(txtLines)+1)
-        # with open(f'temp/theta/{raw_hashtag}.jsonl', 'w', encoding='utf-8') as wfp:
-        #     for t, e in zip(txt_lst, embeds):
-        #         _s = json.dumps(list(t)) + '\n' + \
-        #             json.dumps([float(_) for _ in e])
-        #         wfp.write(_s + '\n')
-        # # 存储模型，使用的时候再用load state_dict
-        # save_name = f'temp/state_dict/{raw_hashtag}.model'
-        # torch.save(model.vae.state_dict(), save_name)
-
+            # # 用训练好的模型将文档中的每一句话对应的topic输出
+            # txt_lst, embeds = model.get_embed(
+            #     train_data=docSet, num=len(txtLines)+1)
+            # with open(f'temp/theta/{raw_hashtag}.jsonl', 'w', encoding='utf-8') as wfp:
+            #     for t, e in zip(txt_lst, embeds):
+            #         _s = json.dumps(list(t)) + '\n' + \
+            #             json.dumps([float(_) for _ in e])
+            #         wfp.write(_s + '\n')
+            # # 存储模型，使用的时候再用load state_dict
+            # save_name = f'temp/state_dict/{raw_hashtag}.model'
+            # torch.save(model.vae.state_dict(), save_name)
+        except:
+            pass
         self.semaphore.release()  # 释放
+        print("释放。。")
 
     def main(self):
-        if not os.path.exists(f"{VAE_PATH}{self.taskname}.json"):
-            with open(f"{VAE_PATH}{self.taskname}.json", 'w') as f:
+        if not os.path.exists(f"{VAE_PATH}{self.dataset}_{self.target}.json"):
+            with open(f"{VAE_PATH}{self.dataset}_{self.target}.json", 'w') as f:
                 json.dump({}, f)
 
         for hashtag in tqdm.tqdm(self.hashtags):
             # if hashtag exists
-            with open(f"{VAE_PATH}{self.taskname}.json", "r", encoding="utf-8") as f:
+            with open(f"{VAE_PATH}{self.dataset}_{self.target}.json", "r", encoding="utf-8") as f:
                 old_data = json.load(f)
                 if hashtag in old_data:
                     continue
             # 多线程处理
+            print("加锁。。")
             self.semaphore.acquire()  # 加锁
             t = threading.Thread(target=self.run, args=(hashtag,))  # 这个逗号不能省略
             t.start()
@@ -156,7 +160,8 @@ class Extract_topic_words:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser('GSM topic model')
-    parser.add_argument('--taskname', type=str,
+    parser.add_argument('--dataset', type=str, default='SDwH')
+    parser.add_argument('--target', type=str,
                         default='trump', help='Taskname e.g trump')
     parser.add_argument('--no_below', type=int, default=1,
                         help='The lower bound of count for words to keep, e.g 10')
