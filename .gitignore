@@ -140,5 +140,6 @@ dmypy.json
 /3-TextGCN/data
 /3-TextGCN/logs
 /3-TextGCN/extract_topic/temp
+/4-BertGCN/data
 /pretrained_models
 /temp

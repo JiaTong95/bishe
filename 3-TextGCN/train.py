@@ -346,7 +346,7 @@ class Instructor:
     def main(self):
         self.result = {"learning_rate": [], "dropout": [], "v": []}
         learning_rate_list = [0.01, 0.02, 0.03, 0.05, 0.001,
-                              0.002, 0.003, 0.005, 0.0001, 0.0002, 0.0003]
+                              0.002, 0.003, 0.005, 0.0001, 0.0002, 0.0003, 0.0005]
         dropout_list = [0, 0.1, 0.2, 0.3, 0.4, 0.5]
         v_list = [0] if self.topic_by == "" else [x/10 for x in range(11)]
         for learning_rate in tqdm.tqdm(learning_rate_list):

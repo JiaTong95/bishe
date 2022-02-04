@@ -188,7 +188,12 @@ def combine_csv_to_txt(train_file, test_file, target):
 
     
 if __name__ == '__main__':
-    params_list = [("SDwH", "trump"), ("SDwH", "biden"), ("PStance", "trump"), ("PStance", "biden"), ("PStance", "bernie")]
+    params_list = [("SDwH", "trump"), 
+                   ("SDwH", "biden"), 
+                   ("PStance", "trump"), 
+                   ("PStance", "biden"), 
+                   ("PStance", "bernie"),
+                   ("semeval16", "a")]
     for dataset, target in params_list:
         CorpusProcess(dataset=dataset, fname=f"{target}_train.csv")
         CorpusProcess(dataset=dataset, fname=f"{target}_test.csv")

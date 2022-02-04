@@ -183,11 +183,14 @@ class BuildGraph:
 
 
 def main():
-    BuildGraph(dataset="SDwH", target="trump")
-    BuildGraph(dataset="SDwH", target="biden")
-    BuildGraph(dataset="PStance", target="trump")
-    BuildGraph(dataset="PStance", target="biden")
-    BuildGraph(dataset="PStance", target="bernie")
+    params_list = [("SDwH", "trump"), 
+                   ("SDwH", "biden"), 
+                   ("PStance", "trump"), 
+                   ("PStance", "biden"), 
+                   ("PStance", "bernie"),
+                   ("semeval16", "a")]
+    for dataset, target in params_list:
+        BuildGraph(dataset=dataset, target=target)
 
 if __name__ == '__main__':
     main()
