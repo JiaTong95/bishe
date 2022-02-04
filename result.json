@@ -1390,6 +1390,58 @@
           "dropout": 0.1,
           "seed": 2020
         }
+      },
+      "gcn": {
+        "macro": {
+          "macro_f1": 0.4875257762221817,
+          "micro_f1": 0.601115760111576,
+          "f_favor": 0.6140939597315436,
+          "f_against": 0.6537931034482758,
+          "f_none": 0.1946902654867257,
+          "learning_rate": 0.03,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0.1,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.603905160390516,
+          "macro_f1": 0.4803385008576679,
+          "f_favor": 0.6030664395229983,
+          "f_against": 0.6648721399730821,
+          "f_none": 0.17307692307692307,
+          "learning_rate": 0.03,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0.3,
+          "seed": 2020
+        }
+      },
+      "gcn_vae": {
+        "macro": {
+          "macro_f1": 0.445536223662698,
+          "micro_f1": 0.5788005578800558,
+          "f_favor": 0.6390685640362225,
+          "f_against": 0.5775401069518716,
+          "f_none": 0.12,
+          "learning_rate": 0.05,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0.3,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.5899581589958159,
+          "macro_f1": 0.4448497672061606,
+          "f_favor": 0.6593137254901961,
+          "f_against": 0.5665399239543726,
+          "f_none": 0.10869565217391303,
+          "learning_rate": 0.05,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0.4,
+          "seed": 2020
+        }
       }
     },
     "biden": {
@@ -1600,6 +1652,58 @@
           "dropout": 0.1,
           "seed": 2020
         }
+      },
+      "gcn": {
+        "macro": {
+          "macro_f1": 0.498859146046764,
+          "micro_f1": 0.696078431372549,
+          "f_favor": 0.7610419026047565,
+          "f_against": 0.6814814814814816,
+          "f_none": 0.054054054054054064,
+          "learning_rate": 0.005,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.6997549019607843,
+          "macro_f1": 0.493584535626753,
+          "f_favor": 0.7620137299771167,
+          "f_against": 0.6909620991253644,
+          "f_none": 0.02777777777777778,
+          "learning_rate": 0.05,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0.1,
+          "seed": 2020
+        }
+      },
+      "gcn_vae": {
+        "macro": {
+          "macro_f1": 0.515956324799341,
+          "micro_f1": 0.6862745098039216,
+          "f_favor": 0.1234567901234568,
+          "f_against": 0.6761768901569187,
+          "f_none": 0.7482352941176471,
+          "learning_rate": 0.05,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0.2,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.696078431372549,
+          "macro_f1": 0.5077268437832044,
+          "f_favor": 0.07792207792207793,
+          "f_against": 0.6839080459770115,
+          "f_none": 0.761350407450524,
+          "learning_rate": 0.002,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0.3,
+          "seed": 2020
+        }
       }
     },
     "trump": {
@@ -1808,6 +1912,58 @@
           "num_epoch": 50,
           "batch_size": 16,
           "dropout": 0.1,
+          "seed": 2020
+        }
+      },
+      "gcn": {
+        "macro": {
+          "macro_f1": 0.4833239488900191,
+          "micro_f1": 0.6884661117717004,
+          "f_favor": 0.6744868035190615,
+          "f_against": 0.7451820128479656,
+          "f_none": 0.030303030303030304,
+          "learning_rate": 0.003,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0.3,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.6884661117717004,
+          "macro_f1": 0.4833239488900191,
+          "f_favor": 0.6744868035190615,
+          "f_against": 0.7451820128479656,
+          "f_none": 0.030303030303030304,
+          "learning_rate": 0.003,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0.3,
+          "seed": 2020
+        }
+      },
+      "gcn_vae": {
+        "macro": {
+          "macro_f1": 0.5064416249332437,
+          "micro_f1": 0.6872770511296076,
+          "f_favor": 0.6542635658914729,
+          "f_against": 0.11428571428571428,
+          "f_none": 0.750775594622544,
+          "learning_rate": 0.05,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0.3,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.6908442330558858,
+          "macro_f1": 0.47467514248503956,
+          "f_favor": 0.6745562130177515,
+          "f_against": 0.0,
+          "f_none": 0.7494692144373672,
+          "learning_rate": 0.03,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0.2,
           "seed": 2020
         }
       }
@@ -2022,6 +2178,84 @@
           "dropout": 0.1,
           "seed": 2020
         }
+      },
+      "gcn_btm": {
+        "macro": {
+          "macro_f1": 0.636693900501744,
+          "micro_f1": 0.6367521367521367,
+          "f_favor": 0.6579634464751959,
+          "f_against": 0.5498281786941581,
+          "f_none": 0.702290076335878,
+          "learning_rate": 0.0005,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.6367521367521367,
+          "macro_f1": 0.636693900501744,
+          "f_favor": 0.6579634464751959,
+          "f_against": 0.5498281786941581,
+          "f_none": 0.702290076335878,
+          "learning_rate": 0.0005,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0,
+          "seed": 2020
+        }
+      },
+      "gcn_vae": {
+        "macro": {
+          "macro_f1": 0.62716436628414,
+          "micro_f1": 0.6260683760683761,
+          "f_favor": 0.6368715083798883,
+          "f_against": 0.5657894736842105,
+          "f_none": 0.6788321167883212,
+          "learning_rate": 0.001,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.6260683760683761,
+          "macro_f1": 0.62716436628414,
+          "f_favor": 0.6368715083798883,
+          "f_against": 0.5657894736842105,
+          "f_none": 0.6788321167883212,
+          "learning_rate": 0.001,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0,
+          "seed": 2020
+        }
+      },
+      "gcn": {
+        "macro": {
+          "macro_f1": 0.60853050397878,
+          "micro_f1": 0.6068376068376068,
+          "f_favor": 0.6153846153846154,
+          "f_against": 0.5862068965517242,
+          "f_none": 0.6240000000000001,
+          "learning_rate": 0.001,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0.2,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.6068376068376068,
+          "macro_f1": 0.60853050397878,
+          "f_favor": 0.6153846153846154,
+          "f_against": 0.5862068965517242,
+          "f_none": 0.6240000000000001,
+          "learning_rate": 0.001,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0.2,
+          "seed": 2020
+        }
       }
     },
     "biden": {
@@ -2229,6 +2463,84 @@
           "learning_rate": 5e-05,
           "num_epoch": 50,
           "batch_size": 16,
+          "dropout": 0.1,
+          "seed": 2020
+        }
+      },
+      "gcn_vae": {
+        "macro": {
+          "macro_f1": 0.6290125091986569,
+          "micro_f1": 0.6309794988610479,
+          "f_favor": 0.6245059288537549,
+          "f_against": 0.5918367346938775,
+          "f_none": 0.6706948640483384,
+          "learning_rate": 0.003,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0.3,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.6309794988610479,
+          "macro_f1": 0.6290125091986569,
+          "f_favor": 0.6245059288537549,
+          "f_against": 0.5918367346938775,
+          "f_none": 0.6706948640483384,
+          "learning_rate": 0.003,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0.3,
+          "seed": 2020
+        }
+      },
+      "gcn_btm": {
+        "macro": {
+          "macro_f1": 0.6208263993704607,
+          "micro_f1": 0.6241457858769932,
+          "f_favor": 0.6413793103448274,
+          "f_against": 0.5606060606060606,
+          "f_none": 0.6604938271604939,
+          "learning_rate": 0.001,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0.5,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.6241457858769932,
+          "macro_f1": 0.6208263993704607,
+          "f_favor": 0.6413793103448274,
+          "f_against": 0.5606060606060606,
+          "f_none": 0.6604938271604939,
+          "learning_rate": 0.001,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0.5,
+          "seed": 2020
+        }
+      },
+      "gcn": {
+        "macro": {
+          "macro_f1": 0.6153458082137523,
+          "micro_f1": 0.6195899772209568,
+          "f_favor": 0.5726141078838175,
+          "f_against": 0.6148867313915857,
+          "f_none": 0.6585365853658536,
+          "learning_rate": 0.05,
+          "num_epoch": 200,
+          "batch_size": 1,
+          "dropout": 0.1,
+          "seed": 2020
+        },
+        "micro": {
+          "micro_f1": 0.6195899772209568,
+          "macro_f1": 0.6124577064909968,
+          "f_favor": 0.5570776255707762,
+          "f_against": 0.6116207951070337,
+          "f_none": 0.6686746987951807,
+          "learning_rate": 0.03,
+          "num_epoch": 200,
+          "batch_size": 1,
           "dropout": 0.1,
           "seed": 2020
         }
