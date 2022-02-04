@@ -188,7 +188,12 @@ def main():
                    ("PStance", "trump"), 
                    ("PStance", "biden"), 
                    ("PStance", "bernie"),
-                   ("semeval16", "a")]
+                   ("semeval16", "a"),
+                   ("semeval16", "cc"),
+                   ("semeval16", "hc"),
+                   ("semeval16", "la"),
+                   ("semeval16", "fm"),
+                  ]
     for dataset, target in params_list:
         BuildGraph(dataset=dataset, target=target)
 

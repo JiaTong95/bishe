@@ -1,4 +1,4 @@
-import gc
+import os
 import warnings
 from time import time
 
@@ -187,6 +187,11 @@ class Instructor:
         self.v = opt.v
         self.val_ratio = opt.val_ratio
 
+        if self.topic_by == "":
+            self.model_name = "gcn"
+        else:
+            self.model_name = "gcn_" + self.topic_by
+
     # 深拷贝数据，节省磁盘IO时间
     def Copy_data(self):
         copy_data = copy.deepcopy(self.data)
@@ -332,15 +337,45 @@ class Instructor:
     @torch.no_grad()
     def test(self):
         self.test_list = torch.tensor(self.test_list).long().to(self.device)
-        test_desc = self.val(self.test_list, prefix="test")
+        t = self.val(self.test_list, prefix="test")
         # test_desc["seed"] = self.seed
-        for key, value in test_desc.items():
+        for key, value in t.items():
             if key not in self.result:
                 self.result[key] = []
             self.result[key].append(value)
         self.result["learning_rate"].append(self.learning_rate)
         self.result["dropout"].append(self.dropout)
         self.result["v"].append(self.v)
+
+        # =====更新最佳结果=====
+        best_macro = {"macro_f1": float(t['macro_f1']), "micro_f1": float(t['micro_f1']), 
+                      "f_favor": float(t['f_favor']), "f_against": float(t['f_against']), "f_none": float(t['f_none']),
+                      "learning_rate": self.learning_rate, "num_epoch": self.max_epoch,
+                      "batch_size": 1, "dropout": self.dropout, "seed": self.seed}
+        best_micro = {"micro_f1": float(t['micro_f1']), "macro_f1": float(t['macro_f1']),
+                       "f_favor": float(t['f_favor']), "f_against": float(t['f_against']), "f_none": float(t['f_none']),
+                       "learning_rate": self.learning_rate, "num_epoch": self.max_epoch,
+                       "batch_size": 1, "dropout": self.dropout, "seed": self.seed}
+        if not os.path.exists('../result.json'):
+            with open(f"../result.json", "w") as file:
+                json.dump({}, file)
+        with open(f"../result.json", "r") as file:
+            _result = json.load(file)
+        if self.dataset not in _result:
+            _result[self.dataset] = {}
+        if self.target not in _result[self.dataset]:
+            _result[self.dataset][self.target] = {}
+        if self.model_name not in _result[self.dataset][self.target]:
+            _result[self.dataset][self.target][self.model_name] = {"macro": {"macro_f1": 0}, "micro": {"micro_f1": 0}}
+        # 按照macro更新
+        if _result[self.dataset][self.target][self.model_name]["macro"]["macro_f1"] < best_macro["macro_f1"]:
+            _result[self.dataset][self.target][self.model_name]["macro"] = best_macro
+        # 按照micro更新
+        if _result[self.dataset][self.target][self.model_name]["micro"]["micro_f1"] < best_micro["micro_f1"]:
+            _result[self.dataset][self.target][self.model_name]["micro"] = best_micro
+        with open(f"../result.json", "w") as file:
+            json.dump(_result, file, indent=2)
+        # =====更新最佳结果=====end
 
     @timer
     def main(self):

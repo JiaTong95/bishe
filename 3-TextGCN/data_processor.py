@@ -193,7 +193,12 @@ if __name__ == '__main__':
                    ("PStance", "trump"), 
                    ("PStance", "biden"), 
                    ("PStance", "bernie"),
-                   ("semeval16", "a")]
+                   ("semeval16", "a"),
+                   ("semeval16", "cc"),
+                   ("semeval16", "hc"),
+                   ("semeval16", "la"),
+                   ("semeval16", "fm"),
+                  ]
     for dataset, target in params_list:
         CorpusProcess(dataset=dataset, fname=f"{target}_train.csv")
         CorpusProcess(dataset=dataset, fname=f"{target}_test.csv")
