@@ -73,9 +73,13 @@ class TOPIC_GRAPH:
 
 if __name__ == "__main__":
     TOPIC_GRAPH(dataset="SDwH", target="trump", topic_by="btm")
-    TOPIC_GRAPH(dataset="SDwH", target="biden", topic_by="btm")
     TOPIC_GRAPH(dataset="SDwH", target="trump", topic_by="vae")
+
+    TOPIC_GRAPH(dataset="SDwH", target="biden", topic_by="btm")
     TOPIC_GRAPH(dataset="SDwH", target="biden", topic_by="vae")
+
+    TOPIC_GRAPH(dataset="PStance", target="trump", topic_by="vae")
+
     TOPIC_GRAPH(dataset="PStance", target="bernie", topic_by="vae")
+    
     TOPIC_GRAPH(dataset="PStance", target="biden", topic_by="vae")
-    # TOPIC_GRAPH(dataset="PStance", target="trump", TOPIC_PATH=BTM_PATH)

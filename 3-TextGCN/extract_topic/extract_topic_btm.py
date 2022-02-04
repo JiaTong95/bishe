@@ -8,6 +8,8 @@ import numpy as np
 import math
 import tqdm
 import threading
+import argparse
+
 from collections import Counter
 from biterm.btm import oBTM
 from sklearn.feature_extraction.text import CountVectorizer
@@ -158,5 +160,10 @@ class BTM:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Run .")
+    parser.add_argument('--dataset', type=str, required=True, help="eg: SDwH")
+    parser.add_argument('--target', type=str, required=True, help="eg: trump")
+    opt = parser.parse_args()
+    
     # btm = BTM("SDwH", "trump")
-    btm = BTM("PStance", "trump")
+    BTM(opt.dataset, opt.target)

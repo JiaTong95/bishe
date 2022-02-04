@@ -361,20 +361,30 @@ class Instructor:
                 json.dump({}, file)
         with open(f"../result.json", "r") as file:
             _result = json.load(file)
+
+        update = False
         if self.dataset not in _result:
             _result[self.dataset] = {}
+            update = True
         if self.target not in _result[self.dataset]:
             _result[self.dataset][self.target] = {}
+            update = True
         if self.model_name not in _result[self.dataset][self.target]:
             _result[self.dataset][self.target][self.model_name] = {"macro": {"macro_f1": 0}, "micro": {"micro_f1": 0}}
+            update = True
         # 按照macro更新
         if _result[self.dataset][self.target][self.model_name]["macro"]["macro_f1"] < best_macro["macro_f1"]:
             _result[self.dataset][self.target][self.model_name]["macro"] = best_macro
+            update = True
         # 按照micro更新
         if _result[self.dataset][self.target][self.model_name]["micro"]["micro_f1"] < best_micro["micro_f1"]:
             _result[self.dataset][self.target][self.model_name]["micro"] = best_micro
-        with open(f"../result.json", "w") as file:
-            json.dump(_result, file, indent=2)
+            update = True
+        
+        if update == True:
+            with open(f"../result.json", "w") as file:
+                json.dump(_result, file, indent=2)
+            print('result updated.')
         # =====更新最佳结果=====end
 
     @timer
