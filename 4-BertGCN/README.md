@@ -6,7 +6,7 @@ This is a self implementations of BertGCN: Transductive Text Classification by C
 
 1. `python data_processor.py --dataset=SDwH --target=trump`
 
-2. `python 2_build_graph.py --dataset=SDwH --target=trump`
+2. `python build_graph.py --dataset=SDwH --target=trump`
 
 3. model=Bert_base`python tokenize_sentence.py --dataset=SDwH --target=trump && python train_bert_base.py --dataset=SDwH --target=trump`
 
