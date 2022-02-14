@@ -1,15 +1,15 @@
 # Step 1 数据预处理
-`python data_processor.py `
+`python data_processor.py --dataset=SDwH --target=trump`
 
 # Step 1.1 btm 提取主题词
-`python extract_topic_btm.py`
+`python extract_topic_btm.py --dataset=SDwH --target=trump`
 
 **如果不用多线程，要跑上十几天**
 
 # Step 1.2 vae 提取主题词
 源代码 https://github.com/zll17/Neural_Topic_Models
 选用了其中的GSM，并对其做了微调
-`python extract_topic_vae.py`
+`python extract_topic_vae.py --dataset=SDwH --target=trump`
 使用VAE提取主题词
 
 注：
@@ -22,11 +22,11 @@
 将一个1\*bow_dim的全1矩阵送入encoder中，将得出的μ和σ标准化，得到z，再经过一层（n_topic, n_topic）的全连接层得到θ，再将得到的θ归一化，最终得到主题分布概率(topic_distribution)。这里的1\*bow_dim的全1矩阵理解为：一个包含有所有单词的很长很长的句子。
 
 # Step 2 建图
-`python build_graph.py`
-`python build_topic_graph.py`
+`python build_graph.py --dataset=SDwH --target=trump`
+`python build_topic_graph.py --dataset=SDwH --target=trump`
 
 # Step 3 训练
-`python train.py`
-`python train.py --topic_by vae`
-`python train.py --topic_by btm --mask`
+`python train.py --dataset=SDwH --target=trump`
+`python train.py --dataset=SDwH --target=trump --topic_by=vae`
+`python train.py --dataset=SDwH --target=trump --topic_by=btm --mask`
 

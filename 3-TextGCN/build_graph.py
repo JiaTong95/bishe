@@ -4,7 +4,7 @@ graph V*V V为sentence数量+word数量，V = s + w，0~s是句子节点，s+1~s
 """
 import os
 from collections import Counter
-
+import argparse
 import networkx as nx
 import json
 import itertools
@@ -182,20 +182,25 @@ class BuildGraph:
         print("\n")
 
 
-def main():
-    params_list = [("SDwH", "trump"), 
-                   ("SDwH", "biden"), 
-                   ("PStance", "trump"), 
-                   ("PStance", "biden"), 
-                   ("PStance", "bernie"),
-                   ("semeval16", "a"),
-                   ("semeval16", "cc"),
-                   ("semeval16", "hc"),
-                   ("semeval16", "la"),
-                   ("semeval16", "fm"),
-                  ]
-    for dataset, target in params_list:
-        BuildGraph(dataset=dataset, target=target)
+# def main():
+#     params_list = [("SDwH", "trump"), 
+#                    ("SDwH", "biden"), 
+#                    ("PStance", "trump"), 
+#                    ("PStance", "biden"), 
+#                    ("PStance", "bernie"),
+#                    ("semeval16", "a"),
+#                    ("semeval16", "cc"),
+#                    ("semeval16", "hc"),
+#                    ("semeval16", "la"),
+#                    ("semeval16", "fm"),
+#                   ]
+#     for dataset, target in params_list:
+#         BuildGraph(dataset=dataset, target=target)
 
 if __name__ == '__main__':
-    main()
+    parser = argparse.ArgumentParser(description="Run .")
+    parser.add_argument('--dataset', type=str, default="SDwH")
+    parser.add_argument('--target', type=str, default="trump")
+    opt = parser.parse_args()
+
+    BuildGraph(dataset=opt.dataset, target=opt.target)

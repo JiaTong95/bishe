@@ -1,7 +1,9 @@
 import json
+from xml.etree.ElementInclude import default_loader
 import networkx as nx
 import re
 import tqdm
+import argparse
 from settings import BTM_PATH, VAE_PATH, WORD2ID_PATH, CLEAN_CORPUS_PATH
 
 # 建立一个V*V的矩阵，其中V为语料库大小
@@ -72,14 +74,22 @@ class TOPIC_GRAPH:
         nx.write_weighted_edgelist(self.g_mask, f"{self.TOPIC_PATH}{self.dataset}_{self.target}_mask.txt")
 
 if __name__ == "__main__":
-    TOPIC_GRAPH(dataset="SDwH", target="trump", topic_by="btm")
-    TOPIC_GRAPH(dataset="SDwH", target="trump", topic_by="vae")
+    parser = argparse.ArgumentParser(description="Run .")
+    parser.add_argument('--dataset', type=str, default="SDwH")
+    parser.add_argument('--target', type=str, default="trump")
+    parser.add_argument('--topic_by', type=str, default="btm")
+    opt = parser.parse_args()
 
-    TOPIC_GRAPH(dataset="SDwH", target="biden", topic_by="btm")
-    TOPIC_GRAPH(dataset="SDwH", target="biden", topic_by="vae")
+    TOPIC_GRAPH(dataset=opt.dataset, target=opt.target, topic_by=opt.topic_by)
+    # TOPIC_GRAPH(dataset="SDwH", target="trump", topic_by="btm")
+    # TOPIC_GRAPH(dataset="SDwH", target="trump", topic_by="vae")
 
-    TOPIC_GRAPH(dataset="PStance", target="trump", topic_by="vae")
+    # TOPIC_GRAPH(dataset="SDwH", target="biden", topic_by="btm")
+    # TOPIC_GRAPH(dataset="SDwH", target="biden", topic_by="vae")
 
-    TOPIC_GRAPH(dataset="PStance", target="bernie", topic_by="vae")
-    
-    TOPIC_GRAPH(dataset="PStance", target="biden", topic_by="vae")
+    # TOPIC_GRAPH(dataset="PStance", target="trump", topic_by="btm")
+    # TOPIC_GRAPH(dataset="PStance", target="trump", topic_by="vae")
+    # TOPIC_GRAPH(dataset="PStance", target="bernie", topic_by="btm")
+    # TOPIC_GRAPH(dataset="PStance", target="bernie", topic_by="vae")
+    # TOPIC_GRAPH(dataset="PStance", target="biden", topic_by="btm")
+    # TOPIC_GRAPH(dataset="PStance", target="biden", topic_by="vae")
