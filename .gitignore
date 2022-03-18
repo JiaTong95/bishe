@@ -1,3 +1,6 @@
+# mypy
+.mypy_cache
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 
@@ -17,5 +20,8 @@ __pycache__/
 /3-TextGCN/logs
 /3-TextGCN/extract_topic/temp
 /4-BertGCN/data
+/4-BertGCN/logs
+/5-prompt/pkl
+/5-prompt/logs
 /pretrained_models
 /temp
