@@ -43,11 +43,11 @@ def record_result(targets, outputs):
     # =====更新最佳结果=====
     best_macro = {"macro_f1": float(f_avg), "micro_f1": float(f_micro), 
                     "f_favor": float(f_favor), "f_against": float(f_against), "f_none": float(f_none),
-                    "learning_rate": f"gcn_lr={args.gcn_lr}, bert_lr={args.bert_lr}", "num_epoch": 1,
+                    "learning_rate": args.bert_lr, "num_epoch": 1,
                     "batch_size": 1, "dropout": 0, "seed": args.seed}
     best_micro = {"micro_f1": float(f_micro), "macro_f1": float(f_avg), 
                     "f_favor": float(f_favor), "f_against": float(f_against), "f_none": float(f_none),
-                    "learning_rate": f"gcn_lr={args.gcn_lr}, bert_lr={args.bert_lr}", "num_epoch": 1,
+                    "learning_rate": args.bert_lr, "num_epoch": 1,
                     "batch_size": 1, "dropout": 0, "seed": args.seed}
     if not os.path.exists('../result.json'):
         with open(f"../result.json", "w") as file:

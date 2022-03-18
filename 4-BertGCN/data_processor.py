@@ -29,6 +29,8 @@ if not os.path.exists("data/ind"):
     os.mkdir("data/ind")
 if not os.path.exists("data/pkl"):
     os.mkdir("data/pkl")
+if not os.path.exists("data/logs"):
+    os.mkdir("data/logs")
 
 doc_content_list = []
 label_list = []

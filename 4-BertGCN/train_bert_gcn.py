@@ -45,6 +45,9 @@ def record_result(targets, outputs):
     with open("../result.json", "r") as file:
         _result = json.load(file)
 
+    with open(f"logs/{args.dataset}_{args.target}_f.txt", 'a+', encoding='utf-8') as file:
+        file.write(f"f_micro={f_micro}, f_avg={f_avg} ,f_against={f_against}, f_favor={f_favor}, f_none={f_none}\tgcn_lr={args.gcn_lr}\tbert_lr={args.bert_lr}\n")
+
     update = False
     if args.dataset not in _result:
         _result[args.dataset] = {}
@@ -178,7 +181,7 @@ def eval(i, data_loader, model: BertGCN, features, graph, usage, device, best_lo
             best_accuracy = correct / total
             torch.save(
                 model.state_dict(), f'data/pkl/{args.dataset}_{args.target}_best_accuracy.pkl')
-            print("saving to file best_accuracy.pkl")
+            print(f"saving to file {args.dataset}_{args.target}_best_accuracy.pkl")
         return best_loss, best_accuracy, no_increasing
 
 
