@@ -48,6 +48,8 @@ class Trainer:
 
         self.label_words = get_label_words(self.opt.label_words_id)
         self.promptTemplate = get_prompt_template(tokenizer=self.tokenizer, tid=self.opt.template_id)
+        print(self.label_words)
+        print(self.promptTemplate)
 
     # 定义预训练语言模型
     def load_plm(self, reload=False):
@@ -67,6 +69,7 @@ class Trainer:
                 "bert", plm_name)
             pickle.dump((self.plm, self.tokenizer, self.model_config, self.WrapperClass),
                         open(f"pkl/{plm_name}.pkl", 'wb'))
+        print("分词器大小", self.tokenizer.vocab_size)
 
     # 打包
 
@@ -135,9 +138,9 @@ class Trainer:
                                                  )
         print("label_words_ids:", self.promptVerbalizer.label_words_ids)
         # creating a pseudo output from the plm, and
-        logits = torch.randn(2, len(self.tokenizer))
-        print(self.promptVerbalizer.process_logits(
-            logits))  # see what the verbalizer do
+        # logits = torch.randn(2, len(self.tokenizer))
+        # print(self.promptVerbalizer.process_logits(
+        #     logits))  # see what the verbalizer do
 
     # 组合构建为PromptModel类
     def get_PromptModel(self):
@@ -171,8 +174,18 @@ class Trainer:
             tot_loss = 0
             for step, inputs in enumerate(self.train_dataloader):
                 inputs = inputs.to(self.opt.device)
-                logits = self.prompt_model(inputs)
                 labels = inputs['label']
+
+                # 下面两行等价于 logits = self.prompt_model(inputs)，为了打印outputs_at_mask拆成了两行
+                outputs_at_mask = self.prompt_model.forward_without_verbalize(inputs)
+                logits = self.prompt_model.verbalizer.process_outputs(outputs_at_mask, inputs)
+                
+                # 下面四行是输出一个batch的[MASK]word和label
+                # outputs_words_id = outputs_at_mask.argmax(-1)
+                # output_words = list(self.tokenizer.convert_ids_to_tokens(outputs_words_id))
+                # for output_word, label in zip(output_words, list(labels)):
+                #     print(output_word, int(label))
+
                 loss = loss_func(logits, labels)
                 loss.backward()
                 tot_loss += loss.item()
@@ -181,6 +194,7 @@ class Trainer:
                 if step % 100 == 1:
                     print("Epoch {}, average loss: {}".format(
                         epoch, tot_loss/(step+1)), flush=True)
+            self.test()
 
     def test(self):
         allpreds, alllabels = [], []

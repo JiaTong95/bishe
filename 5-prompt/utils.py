@@ -79,13 +79,14 @@ class get_topic_words:
         if opt.topic_by == "":
             return text
         elif opt.topic_by == "btm":
-             with open(f"/extend/bishe/3-TextGCN/data/btm/{opt.dataset}_{opt.target}.json", 'r', encoding='utf-8') as f:
+            with open(f"/extend/bishe/3-TextGCN/data/btm/{opt.dataset}_{opt.target}.json", 'r', encoding='utf-8') as f:
                 d = json.load(f)
         elif opt.topic_by == "vae":
             with open(f"/extend/bishe/3-TextGCN/data/vae/{opt.dataset}_{opt.target}.json", 'r', encoding='utf-8') as f:
                 d = json.load(f)
         else:
-            raise Exception("topic_by error, please choose from [btm, vae and (empty)]")
+            raise Exception(
+                "topic_by error, please choose from [btm, vae and (empty)]")
 
         hashtags = re.findall('#\w+', text)
         for hashtag in hashtags:
@@ -114,6 +115,30 @@ def get_label_words(lid=1):
         return [["against", "hate"],
                 ["nothing", "none", "no feelings"],
                 ["in favor of", "support"]]
+    elif lid == 4:
+        # 先定义几个种子词，然后用senticnet做 N-hop，拓展之后作为label_words
+        from senticnet.senticnet import SenticNet
+        sn = SenticNet()
+        N = 3
+        assert N > 0
+        all_seed_words = [["against"],
+                          ["neutral"],
+                          ["favor"]]
+        expanded_seed_words = all_seed_words.copy()
+
+        for label, seed_words in enumerate(all_seed_words):
+            for _h in range(0, N):
+                new_words = seed_words.copy()
+                for word in seed_words:
+                    new_words.extend(sn.semantics(word))
+                # 去重
+                seed_words = list(set(new_words))
+            expanded_seed_words[label] = seed_words
+        return expanded_seed_words
+    elif lid == 5:
+        return [["like", "like_what", "is", "the", "love", "ok", "apple"],
+                ["nothing"],
+                ["favor"]]
     else:
         raise Exception("label_words_id error, please choose id between 1~3")
 
@@ -125,17 +150,17 @@ def get_prompt_template(tokenizer, tid=1):
             text='{"placeholder":"text_a"} is {"mask"}.',
             tokenizer=tokenizer,
         )
-    if tid == 2:
+    elif tid == 2:
         return ManualTemplate(
             text='{"placeholder":"text_a"}. It was {"mask"}.',
             tokenizer=tokenizer,
         )
-    if tid == 3:
+    elif tid == 3:
         return ManualTemplate(
             text='{"placeholder":"text_a"} is {"mask"} of {"placeholder":"text_b"}.',
             tokenizer=tokenizer,
         )
-    if tid == 4:
+    elif tid == 4:
         return ManualTemplate(
             text='{"placeholder":"text_a"}. Its attitude to {"placeholder":"text_b"} is {"mask"}.',
             tokenizer=tokenizer,
