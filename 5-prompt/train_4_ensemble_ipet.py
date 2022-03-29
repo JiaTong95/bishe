@@ -88,29 +88,20 @@ class Trainer:
         """
         定义多个template
         """
-        self.promptTemplate_list = {1:get_prompt_template(tokenizer=self.tokenizer, tid=1),
-                                    2:get_prompt_template(tokenizer=self.tokenizer, tid=2),
-                                    3:get_prompt_template(tokenizer=self.tokenizer, tid=3),
-                                    4:get_prompt_template(tokenizer=self.tokenizer, tid=4)}
+        self.promptTemplate_list = {}
+        for tid in [1, 2, 3, 4, 5, 6, 7, 8]:
+            self.promptTemplate_list[tid] = get_prompt_template(tokenizer=self.tokenizer, tid=tid)
+
     # 定义Verbalizer
     def define_Verbalizer(self):
         """
         定义多个verbalizer
         """
-        self.promptVerbalizer_list = {1:ManualVerbalizer(num_classes=3,
-                                      label_words=get_label_words(lid=1),
-                                      tokenizer=self.tokenizer),
-                                      2: ManualVerbalizer(num_classes=3,
-                                      label_words=get_label_words(lid=2),
-                                      tokenizer=self.tokenizer),
-                                      3: ManualVerbalizer(num_classes=3,
-                                      label_words=get_label_words(lid=3),
-                                      tokenizer=self.tokenizer),
-                                      4: ManualVerbalizer(num_classes=3,
-                                      label_words=get_label_words(lid=4),
-                                      tokenizer=self.tokenizer),}
-                                      
-
+        self.promptVerbalizer_list = {}
+        for lid in [1, 2, 3, 4, 5, 6, 7, 8]:
+            self.promptVerbalizer_list[lid] = ManualVerbalizer(num_classes=3,
+                                                               label_words=get_label_words(lid=lid),
+                                                               tokenizer=self.tokenizer)
 
     # 获取数据集
     def get_dataset(self):
@@ -219,11 +210,23 @@ class Trainer:
                     self.model_list[model_index].reset_model(plm=self.plm, device=self.opt.device)
                 preds = self.train_individual(model_index, stage_training=True)
                 all_preds.append(preds)
+              
+            # 投票
+            preds = []
+            for j in range(len(all_preds[0])):
+                vote = {0: 0, 1: 0, 2: 0}
+                for i in range(len(all_preds)):
+                    pred = all_preds[i][j]
+                    vote[pred] += 1
+                max_num = max(vote.values())
+                pred = []
+                for key in vote.keys():
+                    if vote[key] == max_num:
+                        pred.append(key)
+                preds.append(random.choice(pred))
 
             # 拼接unlabelset
             for model_index in range(len(self.model_list)):
-                # 随机选一个模板预测出来的logits
-                preds = random.choice(all_preds)
                 # 然后在trainset后面加上随机模板预测的unlabelset, 从unlabelset的第start_i行到第end_i行
                 start_i, end_i = each_split_len * stage, each_split_len * stage + each_split_len
                 for i in range(start_i, end_i):
@@ -314,7 +317,7 @@ class Trainer:
         self.define_Verbalizer()
 
         # 准备模型
-        self.define_model(tids_lids=[(1,1), (2,3), (1,4), (4,4)])
+        self.define_model(tids_lids=[(1,1), (2,3), (4,4), (6,8), (7,5)])
 
         # 训练、测试
         self.train_ensemble(reset_model=True)
