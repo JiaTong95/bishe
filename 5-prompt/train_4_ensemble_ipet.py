@@ -205,8 +205,10 @@ class Trainer:
     def train_ensemble(self, reset_model=False):        
         # 每次训练都加一部分testset数据拼在trainset上去, 分N个阶段，每次加N分之一
         self.N_stage = 3
+        # 每次加unlabeled，如果n_split=10,那每次就是加10分之一
+        self.N_split = 10
         test_len = len(self.dataset["test"])
-        each_stage_len = test_len // self.N_stage
+        each_split_len = test_len // self.N_split
         # 开始分阶段训练
         for stage in range(self.N_stage):
             # 分别独立训练
@@ -223,7 +225,7 @@ class Trainer:
                 # 随机选一个模板预测出来的logits
                 preds = random.choice(all_preds)
                 # 然后在trainset后面加上随机模板预测的unlabelset, 从unlabelset的第start_i行到第end_i行
-                start_i, end_i = each_stage_len * stage, each_stage_len * stage + each_stage_len
+                start_i, end_i = each_split_len * stage, each_split_len * stage + each_split_len
                 for i in range(start_i, end_i):
                     pred = preds[i]
                     new_line = copy.deepcopy(self.dataset["test"][i])
