@@ -89,7 +89,7 @@ class Trainer:
         定义多个template
         """
         self.promptTemplate_list = {}
-        for tid in [1, 2, 3, 4, 5, 6, 7, 8]:
+        for tid in [1, 2, 3, 4, 5, 6, 7, 8, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111]:
             self.promptTemplate_list[tid] = get_prompt_template(tokenizer=self.tokenizer, tid=tid)
 
     # 定义Verbalizer
@@ -317,7 +317,8 @@ class Trainer:
         self.define_Verbalizer()
 
         # 准备模型
-        self.define_model(tids_lids=[(1,1), (2,3), (4,4), (6,8), (7,5)])
+        self.define_model(tids_lids=[(101,4), (102,4), (103,4), (104,4), (105,4), 
+                                     (106,4), (107,4), (108,4), (109,4), (110,4), (111,4)])
 
         # 训练、测试
         self.train_ensemble(reset_model=True)
